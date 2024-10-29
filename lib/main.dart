@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'auth/login.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,8 +24,11 @@ class CounterScreen extends StatelessWidget {
       // Tente de te connecter
       await db.open();
       print("Connexion réussie à MongoDB !");
+      final collection = db.collection('contacts');
+      final contacts = await collection.find().toList();
+      print(contacts);
     } catch (e) {
-      print("Échec de la connexion à MongoDBszszs : $e");
+      print("Échec de la connexion à MongoDB : $e");
     } finally {
       // Ferme la connexion, même si elle échoue
       await db.close();
@@ -33,14 +37,14 @@ class CounterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("MongoDB Connection Check")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: checkConnection,
-          child: Text('Vérifier la connexion à MongoDB'),
-        ),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+        useMaterial3: true,
       ),
+      debugShowCheckedModeBanner: false,
+      home: const LoginPage(),
     );
   }
 }
