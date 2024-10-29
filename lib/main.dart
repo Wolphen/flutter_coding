@@ -24,7 +24,7 @@ class CounterScreen extends StatelessWidget {
       await db.open();
       print("Connexion réussie à MongoDB !");
     } catch (e) {
-      print("Échec de la connexion à MongoDB : $e");
+      print("Échec de la connexion à MongoDBszszs : $e");
     } finally {
       // Ferme la connexion, même si elle échoue
       await db.close();
