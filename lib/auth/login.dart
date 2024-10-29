@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_coding/auth/signUp.dart';
-
+import 'package:provider/provider.dart';
+import 'signUp.dart';
+import '../bdd/connectToDTB.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,6 +13,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
+    final mongoDBService = Provider.of<MongoDBService>(context, listen: false);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
@@ -28,8 +31,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
           body: TabBarView(
             children: [
-              SignUpCard(),
-              LoginCard()
+              SignUpCard(mongoDBService: mongoDBService), // Passe mongoDBService ici
+              LoginCard(),
             ],
           ),
         ),
@@ -39,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class LoginCard extends StatelessWidget {
-
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -48,36 +50,37 @@ class LoginCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child:Card(
-        child: Form(
-          key: _loginFormKey,
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: passwordController,
-                  decoration: InputDecoration(labelText: 'Password'),
-                  obscureText: true,
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle login logic here
-                  },
-                  child: const Text('Login'),
-                ),
-              ],
+        child: Card(
+          child: Form(
+            key: _loginFormKey,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(labelText: 'Email'),
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: passwordController,
+                    decoration: InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Logic de connexion
+                      print("Email: ${emailController.text}, Password: ${passwordController.text}");
+                    },
+                    child: const Text('Login'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
