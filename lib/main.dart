@@ -19,7 +19,7 @@ class CounterScreen extends StatelessWidget {
   Future<void> checkConnection() async {
     var password = 'root';
     final encodedPassword = Uri.encodeComponent(password);
-    var db = await mongo.Db.create('mongodb+srv://root:$encodedPassword@flutter.d1rxd.mongodb.net/?retryWrites=true&w=majority&appName=Flutter');
+    var db = await mongo.Db.create('mongodb+srv://root:$encodedPassword@Flutter.d1rxd.mongodb.net/Flutter?retryWrites=true&w=majority&appName=Flutter');
     try {
       // Tente de te connecter
       await db.open();
@@ -47,4 +47,18 @@ class CounterScreen extends StatelessWidget {
       home: const LoginPage(),
     );
   }
+}
+
+class User {
+  final String name;
+  final String surname;
+  final String mail;
+  final int age;
+  final int adresse_postale;
+  final int nb_quizz;
+  final bool admin;
+  final int motivation;
+
+  User({required this.name, required this.surname, required this.mail, required this.age, required this.adresse_postale,
+    required this.nb_quizz, required this.admin, required this.motivation});
 }

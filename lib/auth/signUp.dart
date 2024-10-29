@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_coding/auth/login.dart';
-import 'package:provider/provider.dart';
+import '../main.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -105,7 +106,17 @@ class SignUpCard extends StatelessWidget {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle signup logic here
+                    final newUser = new User(
+                      name: nameController.text, 
+                      surname: prenomController.text, 
+                      mail: emailController.text, 
+                      age: int.parse(ageController.text), 
+                      adresse_postale: int.parse(adresseController.text),
+                      nb_quizz: 0,
+                      admin: true,
+                      motivation: 0
+                    );
+                    register(newUser);
                   },
                   child: Text('Signup'),
                 ),
@@ -117,4 +128,32 @@ class SignUpCard extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> register(User newUser) async {
+    var password = 'root';
+    final encodedPassword = Uri.encodeComponent(password);
+    var db = await mongo.Db.create('mongodb+srv://root:$encodedPassword@Flutter.d1rxd.mongodb.net/Flutter?retryWrites=true&w=majority&appName=Flutter');
+    try {
+      // Tente de te connecter
+      print("Inshallah");
+      await db.open();
+      var collection = db.collection('users');
+      await collection.insert({
+        'name': newUser.name,
+        'surname': newUser.surname,
+        'mail': newUser.mail,
+        'age': newUser.age,
+        'adresse_postale': newUser.adresse_postale,
+        'nb_quizz': newUser.nb_quizz,
+        'admin': newUser.admin,
+        'motivation': newUser.motivation
+      });
+    } catch (e) {
+      print("Échec de la connexion à MongoDB : $e");
+    } finally {
+      // Ferme la connexion, même si elle échoue
+      await db.close();
+    }
+  }
 }
+
