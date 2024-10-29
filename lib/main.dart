@@ -1,24 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
-class CounterModel with ChangeNotifier {
-  int _counter = 0;
-  int get counter => _counter;
-
-  void increment() {
-    _counter++;
-    notifyListeners();
-  }
-}
-
-// Utilisation du Provider en haut de l'arborescence
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => CounterModel(),
-      child: MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,21 +15,31 @@ class MyApp extends StatelessWidget {
 }
 
 class CounterScreen extends StatelessWidget {
+  Future<void> checkConnection() async {
+    var password = 'root';
+    final encodedPassword = Uri.encodeComponent(password);
+    var db = await mongo.Db.create('mongodb+srv://root:$encodedPassword@flutter.d1rxd.mongodb.net/?retryWrites=true&w=majority&appName=Flutter');
+    try {
+      // Tente de te connecter
+      await db.open();
+      print("Connexion réussie à MongoDB !");
+    } catch (e) {
+      print("Échec de la connexion à MongoDB : $e");
+    } finally {
+      // Ferme la connexion, même si elle échoue
+      await db.close();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Counter")),
+      appBar: AppBar(title: Text("MongoDB Connection Check")),
       body: Center(
-        // Utilisation du Consumer pour écouter les changements de CounterModel
-        child: Consumer<CounterModel>(
-          builder: (context, counterModel, child) {
-            return Text('Counter: ${counterModel.counter}');
-          },
+        child: ElevatedButton(
+          onPressed: checkConnection,
+          child: Text('Vérifier la connexion à MongoDB'),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.read<CounterModel>().increment(),
-        child: Icon(Icons.add),
       ),
     );
   }
