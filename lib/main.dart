@@ -1,16 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:provider/provider.dart';
 import 'auth/login.dart';
+import 'auth/signUp.dart';
+import 'bdd/connectToDTB.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DropDownButton()),
+        Provider(create: (_) => MongoDBService()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: CounterScreen(),
+    final mongoDBService = Provider.of<MongoDBService>(context, listen: false);
+
+    return FutureBuilder(
+      future: mongoDBService.connect(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Erreur de connexion à MongoDB'));
+        } else {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: const LoginPage(),
+          );
+        }
+      },
     );
   }
 }
