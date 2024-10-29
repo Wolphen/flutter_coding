@@ -25,27 +25,41 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Page d\'Accueil')),
-      body: Center(
-        child: isLoading
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(title: const Text('Page d\'Accueil')),
+    body: Center(
+      child: isLoading
         ? const CircularProgressIndicator()
-        : GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10.0,
-              mainAxisSpacing: 10.0,
-            ),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              return _buildCard(categories[index], index);
-            },
+        : Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  'Tester ces compétences:',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10.0,
+                    mainAxisSpacing: 10.0,
+                  ),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    return _buildCard(categories[index], index);
+                  },
+                ),
+              ),
+            ],
           ),
-      ),  
-    );
-  }
+    ),
+  );
+}
+
 //---------------------------Cards---------------------------//
 
   final List<Color> buttonColors = [

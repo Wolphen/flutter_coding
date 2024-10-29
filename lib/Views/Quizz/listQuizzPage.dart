@@ -45,27 +45,45 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
   //     });
   //   });
   // }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Liste des Quizz'),
-      ),
-      body: isLoading
-        ? const CircularProgressIndicator()
-        : GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10.0,
-          mainAxisSpacing: 10.0,
-        ),
-        itemCount: quizz.length,
-        itemBuilder: (context, index) {
-          return _buildCard(quizz[index], index);
-        },
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Liste des Quizz'),
+    ),
+    body: Center(
+      child: isLoading
+        ? const Center(child: CircularProgressIndicator())
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Choisissez un quizz :',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(8.0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 10.0,
+                ),
+                itemCount: quizz.length,
+                itemBuilder: (context, index) {
+                  return _buildCard(quizz[index], index);
+                },
+              ),
+            ),
+            ],
+          ),
       ),
     );
   }
+
 
   //---------------------------Cards---------------------------//
   
