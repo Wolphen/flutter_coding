@@ -3,6 +3,7 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:provider/provider.dart';
 import 'auth/login.dart';
 import 'auth/signUp.dart';
+import 'Views/homPage.dart';
 import 'bdd/connectToDTB.dart';
 
 void main() {
@@ -69,7 +70,7 @@ class CounterScreen extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
+      home: const HomePage(),
     );
   }
 }

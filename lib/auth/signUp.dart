@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login.dart';
 import '../bdd/connectToDTB.dart';
+import '../Views/homPage.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -168,6 +169,16 @@ class SignUpCard extends StatelessWidget {
                           },
                         );
                       }),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()), // Redirection vers HomePage
+                        );
+                      },
+                      child: Text('Retour à la page d\'accueil'),
                     ),
                     SizedBox(height: 20),
                     ElevatedButton(
