@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../Models/quizz.dart';
+import '../../Models/quizz.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import '../Views/quizzPage.dart';
+import '../../Views/Quizz/quizzPage.dart';
 
   
 void onPress(BuildContext context, Quizz quizz) {
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => QuizzPage(quizzId: quizz.id)),
+    MaterialPageRoute(builder: (context) => QuizzPage(quizzId: quizz.id, quizzNom: quizz.nom)),
   );
 }
 
@@ -18,7 +18,7 @@ Future<List<Quizz>> onInit(String categorieId) async {
   var db = await mongo.Db.create('mongodb+srv://root:$encodedPassword@Flutter.d1rxd.mongodb.net/Flutter?retryWrites=true&w=majority&appName=Flutter');
   try {
     await db.open();
-    final collection = db.collection('quizz');
+    final collection = db.collection('Quizz');
     var filter = {'id_categ': categorieId};
     var result = await collection.find(filter).toList();
     for (var doc in result) {

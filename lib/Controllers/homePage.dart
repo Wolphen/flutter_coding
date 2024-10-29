@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Models/categorie.dart';
-import '../Views/listQuizzPage.dart';
+import '../Views/Quizz/listQuizzPage.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
   
