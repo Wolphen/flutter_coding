@@ -1,5 +1,5 @@
 class Note {
-  String? id;
+  Object? id;
   String id_quiz;
   String id_user;
   int score;
@@ -15,7 +15,6 @@ class Note {
 
     Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'id_quiz': id_quiz,
       'id_user': id_user,
       'score': score,

@@ -148,4 +148,9 @@ class MongoDBService {
     }
     return reponses;
   }
+
+  Future<void> insertQuizz(Quizz quizz) async {
+    await ensureConnected();
+    await db.collection('Quizz').insert(quizz.toJson());
+  }
 }

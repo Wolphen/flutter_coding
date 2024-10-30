@@ -2,7 +2,7 @@
 import 'reponse.dart';
 
 class Question {
-  String? id;
+  Object? id;
   String id_quizz;
   String texte;
   int timer;
@@ -15,4 +15,12 @@ class Question {
     required this.timer,
     this.reponses,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id_quizz': id_quizz,
+      'texte': texte,
+      'timer': timer,
+    };
+  }
 }

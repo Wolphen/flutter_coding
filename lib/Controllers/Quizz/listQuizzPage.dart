@@ -9,7 +9,7 @@ void onPress(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) {
     context,
     MaterialPageRoute(
       builder: (context) => QuizzPage(
-        quizzId: quizz.id!,
+        quizzId: quizz.id.toString(),
         quizzNom: quizz.nom,
         userInfo: userInfo, // Passez `userInfo` ici
       ),

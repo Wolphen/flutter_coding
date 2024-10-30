@@ -1,7 +1,7 @@
 // lib/Models/categorie.dart
 
 class Categorie {
-  String id;
+  Object? id;
   String nom;
 
   Categorie({

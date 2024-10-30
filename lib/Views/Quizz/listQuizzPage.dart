@@ -85,7 +85,7 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
         onPress(context, quizz, widget.userInfo); // Utilisez `widget.userInfo`
       },
       onLongPress: () {
-        onAddQuizz(context, quizz.id!, widget.categorieId, widget.userInfo);
+        onAddQuizz(context, quizz.id.toString(), widget.categorieId, widget.userInfo);
       },
       child: Card(
         child: Center(

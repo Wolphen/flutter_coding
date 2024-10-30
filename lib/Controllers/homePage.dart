@@ -8,7 +8,7 @@ void onPress(BuildContext context, Categorie categorie, Map<String, dynamic> use
     context,
     MaterialPageRoute(
       builder: (context) => ListeQuizzPage(
-        categorieId: categorie.id,
+        categorieId: categorie.id.toString(),
         userInfo: userInfo, // Passez `userInfo` ici
       ),
     ),
@@ -26,7 +26,7 @@ Future<List<Categorie>> onInit() async {
     final collection = db.collection('Categorie');
     var result = await collection.find().toList();
     for (var doc in result) {
-      categories.add(Categorie(id: doc['id'].toString(), nom: doc['nom']));
+      categories.add(Categorie(id: doc['_id'], nom: doc['nom']));
     }
   } catch (e) {
     print("Échec de la connexion à MongoDB : $e");
