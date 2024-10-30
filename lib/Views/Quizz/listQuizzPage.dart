@@ -4,17 +4,19 @@ import '../../Controllers/Quizz/listQuizzPage.dart';
 
 class ListeQuizzPage extends StatefulWidget {
   final String categorieId;
+  final Map<String, dynamic> userInfo; // Ajoutez `userInfo` ici
 
-  const ListeQuizzPage({Key? key, required this.categorieId}) : super(key: key);
+  const ListeQuizzPage({
+    Key? key,
+    required this.categorieId,
+    required this.userInfo, // Ajoutez `userInfo` ici
+  }) : super(key: key);
 
   @override
   State<ListeQuizzPage> createState() => _ListeQuizzPageState();
 }
 
 class _ListeQuizzPageState extends State<ListeQuizzPage> {
-
-  //---------------------------Liste des quizz---------------------------//
-
   List<Quizz> quizz = [];
   bool isLoading = false;
 
@@ -33,28 +35,16 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
     ];
   }
 
-  // List<Quizz> quizz = [];
-  // bool isLoading = true;
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   onInit(widget.categorieId).then((value) {
-  //     setState(() {
-  //       quizz = value;
-  //       isLoading = false;
-  //     });
-  //   });
-  // }
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Liste des Quizz'),
-    ),
-    body: Center(
-      child: isLoading
-        ? const Center(child: CircularProgressIndicator())
-      : Column(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Liste des Quizz'),
+      ),
+      body: Center(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
@@ -83,18 +73,16 @@ Widget build(BuildContext context) {
               ),
             ),
           ],
-          ),
         ),
+      ),
     );
   }
 
-
   //---------------------------Cards---------------------------//
-  
   Widget _buildCard(Quizz quizz, int index) {
     return GestureDetector(
       onTap: () {
-        onPress(context, quizz);
+        onPress(context, quizz, widget.userInfo); // Utilisez `widget.userInfo`
       },
       onLongPress: () {
         onAddQuizz(context, quizz.id!, widget.categorieId);
@@ -120,4 +108,3 @@ Widget build(BuildContext context) {
     );
   }
 }
- 

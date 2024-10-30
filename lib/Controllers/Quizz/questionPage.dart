@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import '../../Views/homPage.dart';
 import '../../Models/note.dart';
 
-void onPressed(BuildContext context) {
+void onPressed(BuildContext context, Map<String, dynamic> userInfo) { // Ajoutez le paramètre userInfo
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => const HomePage()), // Redirection vers HomePage
+    MaterialPageRoute(
+      builder: (context) => HomePage(userInfo: userInfo), // Passez userInfo ici
+    ),
   );
 }
+
 
 Future<List<Question>> onInit(String quizzId) async {
   List<Question> listeQuestions = [];

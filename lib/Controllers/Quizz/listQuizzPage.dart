@@ -3,18 +3,26 @@ import '../../Models/quizz.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import '../../Views/Quizz/quizzPage.dart';
 import '../../Views/Quizz/newQuizz/newQuizz.dart';
-  
-void onPress(BuildContext context, Quizz quizz) {
+
+void onPress(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) {
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => QuizzPage(quizzId: quizz.id!, quizzNom: quizz.nom)),
+    MaterialPageRoute(
+      builder: (context) => QuizzPage(
+        quizzId: quizz.id!,
+        quizzNom: quizz.nom,
+        userInfo: userInfo, // Passez `userInfo` ici
+      ),
+    ),
   );
 }
 
 void onAddQuizz(BuildContext context, String? quizzId, String categorieId) {
-    Navigator.push(
+  Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId)),
+    MaterialPageRoute(
+      builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId),
+    ),
   );
 }
 
@@ -22,7 +30,8 @@ Future<List<Quizz>> onInit(String categorieId) async {
   List<Quizz> listeQuizz = [];
   var password = 'root';
   final encodedPassword = Uri.encodeComponent(password);
-  var db = await mongo.Db.create('mongodb+srv://root:$encodedPassword@Flutter.d1rxd.mongodb.net/Flutter?retryWrites=true&w=majority&appName=Flutter');
+  var db = await mongo.Db.create(
+      'mongodb+srv://root:$encodedPassword@Flutter.d1rxd.mongodb.net/Flutter?retryWrites=true&w=majority&appName=Flutter');
   try {
     await db.open();
     final collection = db.collection('Quizz');

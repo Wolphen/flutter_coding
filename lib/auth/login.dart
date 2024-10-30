@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../bdd/session_manager.dart';
 import 'signUp.dart';
-import '../home_page.dart'; // Assurez-vous de bien importer home_page.dart ici
+import '../Views/homPage.dart'; // Assurez-vous de bien importer home_page.dart ici
 import '../bdd/connectToDTB.dart';
 
 class LoginPage extends StatefulWidget {
@@ -62,16 +62,8 @@ class _LoginPageState extends State<LoginPage> {
               child: const Text("Se connecter"),
             ),
           ],
-
-        ),
-        body: TabBarView(
-          children: [
-            SignUpCard(mongoDBService: mongoDBService), // Passe mongoDBService ici
-            LoginCard(),
-          ],
         ),
       ),
-    ),
     );
   }
 }
@@ -135,3 +127,6 @@ class LoginCard extends StatelessWidget {
     );
   }
 }
+
+
+

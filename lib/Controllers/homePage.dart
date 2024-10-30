@@ -3,13 +3,18 @@ import '../Models/categorie.dart';
 import '../Views/Quizz/listQuizzPage.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
-  
-void onPress(BuildContext context, Categorie categorie) {
+void onPress(BuildContext context, Categorie categorie, Map<String, dynamic> userInfo) {
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => ListeQuizzPage(categorieId: categorie.id)),
+    MaterialPageRoute(
+      builder: (context) => ListeQuizzPage(
+        categorieId: categorie.id,
+        userInfo: userInfo, // Passez `userInfo` ici
+      ),
+    ),
   );
 }
+
 
 Future<List<Categorie>> onInit() async {
   List<Categorie> categories = [];

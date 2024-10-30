@@ -37,8 +37,8 @@ class _SignUpPageState extends State<SignUpPage> {
           title: const Text('SignUp'),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Login'),
               Tab(text: 'Sign Up'),
+              Tab(text: 'Login'),
             ],
           ),
         ),

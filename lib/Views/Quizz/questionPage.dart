@@ -9,7 +9,14 @@ import '../../Views/homPage.dart';
 class QuestionPage extends StatefulWidget {
   final String quizzId;
   final String quizzNom;
-  const QuestionPage({Key? key, required this.quizzId, required this.quizzNom}) : super(key: key);
+  final Map<String, dynamic> userInfo; // Ajoutez ce paramètre pour userInfo
+
+  const QuestionPage({
+    Key? key,
+    required this.quizzId,
+    required this.quizzNom,
+    required this.userInfo, // Ajoutez ce paramètre
+  }) : super(key: key);
 
   @override
   State<QuestionPage> createState() => _QuestionPageState();
@@ -122,9 +129,11 @@ class _QuestionPageState extends State<QuestionPage> {
                         ElevatedButton(
                           onPressed: () {
                             saveResult(score, questions);
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => const HomePage()),
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(userInfo: widget.userInfo), // Assurez-vous de fournir userInfo ici
+                              ),
                             );
                           },
                           child: const Text('Retour à la page d\'accueil'),
@@ -188,7 +197,7 @@ class _QuestionPageState extends State<QuestionPage> {
                   child: const Text('Confirmer'),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    onPressed(context);
+                    onPressed(context, widget.userInfo); // Utilisez widget.userInfo ici
                   },
                 ),
               ],
