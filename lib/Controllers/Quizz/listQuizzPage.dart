@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../Models/quizz.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import '../../Views/Quizz/quizzPage.dart';
-import '../../Views/Quizz/newQuizz/newQuizz.dart';
 
 void onPress(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) {
   Navigator.push(
