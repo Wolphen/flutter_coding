@@ -5,11 +5,10 @@ import '../../../Models/question.dart';
 import '../../../Models/reponse.dart';
 
 class NewQuizz extends StatefulWidget {
-  final String? quizzId;
   final String categorieId;
   final Map<String, dynamic> userInfo; // Ajoutez ce paramètre pour userInfo
   
-  const NewQuizz({super.key,this.quizzId, required this.categorieId, required this.userInfo});
+  const NewQuizz({super.key, required this.categorieId, required this.userInfo});
 
   @override
   State<NewQuizz> createState() => _NewQuizzState();

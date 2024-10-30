@@ -2,6 +2,7 @@ import '../../Models/quizz.dart';
 import '../../Models/question.dart';
 import '../../Models/reponse.dart';
 import 'package:flutter/material.dart';
+import '../../bdd/connectToDTB.dart';
 
 
 Future<void> removeQuestion(Quizz quizz, int index) async {
@@ -14,17 +15,11 @@ bool editQuestion(BuildContext context) {
 }
 
 Future<void> onSubmit(Quizz quizz) async {
-  for (var question in quizz.questions!) {
-    print(question.texte);
-    for (var reponse in question.reponses!) {
-      print(reponse.texte);
-    }
-  }
+  await MongoDBService().insertQuizz(quizz);
 }
 
 Quizz onInitNew(String categorieId) {
   Quizz quizz = initQuizz(categorieId);
-  print(quizz);
   return quizz;
 }
 
@@ -32,7 +27,6 @@ Quizz onInitNew(String categorieId) {
 // Initialisation du quiz
 Quizz initQuizz(String categorieId) {
   return Quizz(
-    id: '',
     nom: '',
     id_categ: categorieId,
     questions: [],
@@ -51,6 +45,6 @@ Question initQuestion() {
 
 // Initialisation des réponses
 List<Reponse> initReponses() {
-  return List.generate(4, (index) => Reponse(id: "", id_qu: "", texte: "", is_correct: false));
+    return List.generate(4, (index) => Reponse(id_qu: "", texte: "", is_correct: false));
 }
 

@@ -17,11 +17,11 @@ void onPress(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) {
   );
 }
 
-void onAddQuizz(BuildContext context, String? quizzId, String categorieId, Map<String, dynamic> userInfo) {
+void onAddQuizz(BuildContext context, String categorieId, Map<String, dynamic> userInfo) {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId, userInfo: userInfo),
+      builder: (context) => NewQuizz(categorieId: categorieId, userInfo: userInfo),
     ),
   );
 }
@@ -38,7 +38,7 @@ Future<List<Quizz>> onInit(String categorieId) async {
     var filter = {'id_categ': categorieId};
     var result = await collection.find(filter).toList();
     for (var doc in result) {
-      listeQuizz.add(Quizz(id: doc['id'].toString(), nom: doc['nom'], id_categ: doc['id_categ'].toString()));
+      listeQuizz.add(Quizz(id: doc['_id'].toString(), nom: doc['nom'], id_categ: doc['id_categ'].toString()));
     }
   } catch (e) {
     print("Échec de la connexion à MongoDB : $e");

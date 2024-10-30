@@ -31,9 +31,9 @@ Future<List<Question>> onInit(String quizzId) async {
       var filterReponse = {'id_question': question['id']};
       var reponses = await collectionReponse.find(filterReponse).toList();
       for (var reponse in reponses) {
-        listeReponses.add(Reponse(id: reponse['id'].toString(), id_qu: reponse['id_question'].toString(), texte: reponse['texte'], is_correct: reponse['is_correct']));
+        listeReponses.add(Reponse(id: reponse['_id'].toString(), id_qu: reponse['id_question'].toString(), texte: reponse['texte'], is_correct: reponse['is_correct']));
       }
-      listeQuestions.add(Question(id: question['id'].toString(), id_quizz: question['id_quizz'].toString(), texte: question['texte'], timer: question['timer'], reponses: listeReponses));
+      listeQuestions.add(Question(id: question['_id'].toString(), id_quizz: question['id_quizz'].toString(), texte: question['texte'], timer: question['timer'], reponses: listeReponses));
     }
   } catch (e) {
     print("Échec de la connexion à MongoDB : $e");

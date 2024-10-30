@@ -26,7 +26,7 @@ Future<List<Categorie>> onInit() async {
     final collection = db.collection('Categorie');
     var result = await collection.find().toList();
     for (var doc in result) {
-      categories.add(Categorie(id: doc['_id'], nom: doc['nom']));
+      categories.add(Categorie(id: doc['_id'].toHexString(), nom: doc['nom'].toString()));
     }
   } catch (e) {
     print("Échec de la connexion à MongoDB : $e");

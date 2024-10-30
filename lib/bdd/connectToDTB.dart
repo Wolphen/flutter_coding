@@ -101,14 +101,14 @@ class MongoDBService {
     Quizz quizz = Quizz(id: quizzId, nom: "", id_categ: categorieId);
     await ensureConnected();
     final collectionQuizz = db.collection('Quizz');
-    final filter = {'id': quizzId};
+    final filter = {'_id': mongo.ObjectId.fromHexString(quizzId)};
     final result = await collectionQuizz.find(filter).toList();
     for (var doc in result) {
       final questions = await fetchQuestions(db, quizzId);
       quizz = Quizz(
-        id: doc['id'].toString(),
+        id: doc['_id'].toHexString(),
         nom: doc['nom'],
-        id_categ: doc['id_categ'].toString(),
+        id_categ: doc['id_categ'].toHexString(),
         questions: questions,
       );
     }
@@ -121,10 +121,10 @@ class MongoDBService {
     final filterQuestion = {'id_quizz': quizzId};
     final resultQuestion = await collectionQuestion.find(filterQuestion).toList();
     for (var docQuestion in resultQuestion) {
-      final reponses = await fetchReponses(db, docQuestion['id'].toString());
+      final reponses = await fetchReponses(db, docQuestion['_id'].toHexString());
       questions.add(Question(
-        id: docQuestion['id'].toString(),
-        id_quizz: docQuestion['id_quizz'].toString(),
+        id: docQuestion['_id'].toHexString(),
+        id_quizz: docQuestion['id_quizz'].toHexString(),
         texte: docQuestion['texte'],
         timer: docQuestion['timer'],
         reponses: reponses,
@@ -140,8 +140,8 @@ class MongoDBService {
     final resultReponse = await collectionReponse.find(filterReponse).toList();
     for (var docReponse in resultReponse) {
       reponses.add(Reponse(
-        id: docReponse['id'].toString(),
-        id_qu: docReponse['id_qu'].toString(),
+        id: docReponse['_id'].toHexString(),
+        id_qu: docReponse['id_qu'].toHexString(),
         texte: docReponse['texte'],
         is_correct: docReponse['is_correct'],
       ));
@@ -151,6 +151,19 @@ class MongoDBService {
 
   Future<void> insertQuizz(Quizz quizz) async {
     await ensureConnected();
-    await db.collection('Quizz').insert(quizz.toJson());
+    var result = await db.collection('Quizz').insertOne(quizz.toJson());
+    print("Quizz inséré avec succès dans MongoDB !");
+    final idQuizz = result.id.toHexString();
+    for (var question in quizz.questions!) {
+      question.id_quizz = idQuizz;
+      var result = await db.collection('Question').insertOne(question.toJson());
+      print("Questions inséré avec succès dans MongoDB !");
+      final idQuestion = result.id.toHexString();
+      for (var reponse in question.reponses!) {
+        reponse.id_qu = idQuestion;
+        await db.collection('Reponse').insertOne(reponse.toJson());
+        print("Reponse inséré avec succès dans MongoDB !");
+      }
+    }
   }
 }

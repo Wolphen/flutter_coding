@@ -1,14 +1,15 @@
 // lib/Models/quizz.dart
 import 'question.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
 class Quizz {
-  Object id;
+  String? id;
   String nom;
   String id_categ;
   List<Question>? questions;
 
   Quizz({
-    required this.id,
+    this.id,
     required this.nom,
     required this.id_categ,
     this.questions,
@@ -17,7 +18,7 @@ class Quizz {
   Map<String, dynamic> toJson() {
     return {
       'nom': nom,
-      'id_categ': id_categ,
+      'id_categ': ObjectId.fromHexString(id_categ),
     };
   }
 }

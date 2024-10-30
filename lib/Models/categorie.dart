@@ -1,11 +1,11 @@
 // lib/Models/categorie.dart
 
 class Categorie {
-  Object? id;
+  String? id;
   String nom;
 
   Categorie({
-    required this.id,
+    this.id,
     required this.nom,
   });
 }

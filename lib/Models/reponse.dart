@@ -1,7 +1,7 @@
 // lib/Models/reponse.dart
-
+import 'package:mongo_dart/mongo_dart.dart';
 class Reponse {
-  Object? id;
+  String? id;
   String? id_qu;
   String texte;
   bool is_correct;
@@ -15,7 +15,7 @@ class Reponse {
 
   Map<String, dynamic> toJson() {
     return {
-      'id_qu': id_qu,
+      'id_qu': ObjectId.fromHexString(id_qu!),
       'texte': texte,
       'is_correct': is_correct,
     };
