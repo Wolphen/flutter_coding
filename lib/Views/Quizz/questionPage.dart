@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../Models/question.dart';
 import '../../Models/reponse.dart';
@@ -38,6 +40,7 @@ class _QuestionPageState extends State<QuestionPage> {
   void initState() {
     super.initState();
     _initQuestions();
+    _startTimer();
   }
   void _initQuestions() {
     questions = [
@@ -77,6 +80,24 @@ class _QuestionPageState extends State<QuestionPage> {
     });
   }
 
+  void _startTimer() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      if (currentQuestionIndex < questions.length) {
+        setState(() {
+          if (questions[currentQuestionIndex].timer > 0) {
+            questions[currentQuestionIndex].timer--;
+          } else {
+            timer.cancel();
+            currentQuestionIndex++;
+            _startTimer();
+          }
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,6 +109,7 @@ class _QuestionPageState extends State<QuestionPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildQuestionText(),
+                      _buildTimer(),
                       _buildAnswerButtons(context),
                     ],
                   )
@@ -111,6 +133,13 @@ class _QuestionPageState extends State<QuestionPage> {
                     ),
                   ),
       ),
+    );
+  }
+
+  Widget _buildTimer() {
+    return Text(
+      "Temps restant: ${questions[currentQuestionIndex].timer} secondes",
+      style: const TextStyle(fontSize: 18),
     );
   }
 
