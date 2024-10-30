@@ -3,8 +3,8 @@ import '../../../Models/question.dart';
 import '../../../Controllers/Quizz/newQuizz/newQuestion.dart';
 
 class NewQuestion extends StatefulWidget {
-  final String quizzId;
-  const NewQuestion({super.key,required this.quizzId});
+  final String? quizzId;
+  const NewQuestion({super.key,this.quizzId});
 
   @override
   State<NewQuestion> createState() => _NewQuestionState();
@@ -15,9 +15,10 @@ class _NewQuestionState extends State<NewQuestion> {
   @override
   void initState() {
     super.initState();
+    initQuestion();
   }
   void initQuestion() {
-    question = Question(texte: "", reponses: [], id_quizz: widget.quizzId, timer: 0);
+    question = Question(texte: "", reponses: [], id_quizz: widget.quizzId!, timer: 0);
   }
 
   @override
@@ -26,7 +27,6 @@ class _NewQuestionState extends State<NewQuestion> {
       appBar: AppBar(title: const Text('Créer une nouvelle question')),
       body: Column(
         children: [
-          const Text('NewQuestion'),
           TextField(
             controller: TextEditingController(text: question.texte),
             decoration: const InputDecoration(labelText: 'Nom'),
@@ -40,7 +40,7 @@ class _NewQuestionState extends State<NewQuestion> {
             onPressed: () {
               newResponse(context, question.id!);
             },
-            child: const Text('Ajouter une question'),
+            child: const Text('Ajouter une réponse'),
           ),
           Expanded(
             child: ListView.builder(
@@ -63,7 +63,7 @@ class _NewQuestionState extends State<NewQuestion> {
       bottomNavigationBar: BottomAppBar(
         child: ElevatedButton(
           onPressed: () {
-            //onSubmit(quizz);
+            onSubmit(context, question);
           },
           child: const Text('Créer'),
         ),

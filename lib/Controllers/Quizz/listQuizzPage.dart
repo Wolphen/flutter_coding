@@ -11,7 +11,7 @@ void onPress(BuildContext context, Quizz quizz) {
   );
 }
 
-void onAddQuizz(BuildContext context, String quizzId, String categorieId) {
+void onAddQuizz(BuildContext context, String? quizzId, String categorieId) {
     Navigator.push(
     context,
     MaterialPageRoute(builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId)),

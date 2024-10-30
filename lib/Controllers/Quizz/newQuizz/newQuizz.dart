@@ -13,9 +13,13 @@ Future<void> newQuestion(BuildContext context, String quizzId) async {
   Navigator.push(context, MaterialPageRoute(builder: (context) => NewQuestion(quizzId: quizzId)));
 }
 
+bool editQuestion(BuildContext context) {
+  return true;
+}
+
 
 Future<Quizz> onInit(String quizzId, String categorieId) async {
-  Quizz quizz = Quizz(id: "", nom: "", id_categ: "");
+  Quizz quizz = Quizz(id: quizzId, nom: "", id_categ: categorieId);
   final encodedPassword = Uri.encodeComponent('root');
   final dbUrl = 'mongodb+srv://root:$encodedPassword@Flutter.d1rxd.mongodb.net/Flutter?retryWrites=true&w=majority&appName=Flutter';
   mongo.Db? db;
