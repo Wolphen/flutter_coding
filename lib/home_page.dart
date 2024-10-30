@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import './bdd/session_manager.dart';
+import 'header.dart';
 
 class HomePage extends StatefulWidget {
-  final Map<String, dynamic> userInfo; // Reçoit les informations utilisateur lors de la connexion
+  final Map<String, dynamic> userInfo;
 
   const HomePage({Key? key, required this.userInfo}) : super(key: key);
 
@@ -12,22 +13,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late String pseudo;
-  late String email;
-  late String userId;
-  late String admin;
+  late bool isAdmin;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialisation des informations utilisateur depuis `userInfo`
     pseudo = widget.userInfo['nom'] ?? 'Utilisateur';
-    email = widget.userInfo['mail'] ?? 'Email non disponible';
-    userId = widget.userInfo['_id'].toString();
-    admin = widget.userInfo['admin'].toString();
-
+    isAdmin = widget.userInfo['admin'] ?? false;
   }
-
 
   // Fonction de déconnexion de l'utilisateur
   void _logout() async {
@@ -38,35 +32,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Accueil"),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  pseudo,
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                ),
-                Text(
-                  email,
-                  style: const TextStyle(fontSize: 14, color: Colors.white70),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          ),
-        ],
+      appBar: Header(
+        nom: pseudo,
+        isAdmin: isAdmin,
+        onLogout: _logout,
       ),
       body: Center(
         child: Text(
-          "Bienvenue, $pseudo\n mail : $email \n id : $userId \n admin: $admin",
+          "Bienvenue sur la page d'accueil, $pseudo",
           style: const TextStyle(fontSize: 24),
         ),
       ),
