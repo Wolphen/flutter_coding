@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../Models/quizz.dart';
 import '../../../Models/question.dart';
 import '../../../Models/reponse.dart';
-import '../../../Controllers/Quizz/newQuizz/newQuizz.dart';
+import '../../../Controllers/Quizz/newQuizz.dart';
 
 class NewQuizz extends StatefulWidget {
   final String? quizzId;
@@ -25,8 +25,8 @@ class _NewQuizzState extends State<NewQuizz> {
   @override
   void initState() {
     super.initState();
-    quizz = onInit(widget.quizzId!, widget.categorieId);
-    newQuestion = initQuestion(widget.quizzId!);
+    quizz = onInitNew(widget.quizzId!, widget.categorieId);
+    newQuestion = initQuestion();
     reponses = initReponses();
   }
 

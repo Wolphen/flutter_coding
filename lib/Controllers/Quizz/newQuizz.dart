@@ -1,17 +1,13 @@
-import '../../../Models/quizz.dart';
-import '../../../Models/question.dart';
-import '../../../Models/reponse.dart';
+import '../../Models/quizz.dart';
+import '../../Models/question.dart';
+import '../../Models/reponse.dart';
 import 'package:flutter/material.dart';
-import '../../../Views/Quizz/newQuizz/newQuestion.dart';
 
 
 Future<void> removeQuestion(Quizz quizz, int index) async {
   quizz.questions!.removeAt(index);
 }
 
-Future<void> newQuestion(BuildContext context, String quizzId) async {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => NewQuestion(quizzId: quizzId)));
-}
 
 bool editQuestion(BuildContext context) {
   return true;
@@ -23,9 +19,9 @@ Future<void> onSubmit(Quizz quizz) async {
   }
 }
 
-Quizz onInit(String quizzId, String categorieId) {
+Quizz onInitNew(String quizzId, String categorieId) {
   Quizz quizz = initQuizz(quizzId, categorieId);
-  quizz.questions = [initQuestion(quizzId)];
+  quizz.questions = [initQuestion()];
   for (var question in quizz.questions!) {
     question.reponses = initReponses();
   }
@@ -44,11 +40,11 @@ Quizz initQuizz(String quizzId, String categorieId) {
 }
 
 // Initialisation d'une nouvelle question
-Question initQuestion(String quizzId) {
+Question initQuestion() {
   return Question(
     texte: '',
     reponses: [],
-    id_quizz: quizzId,
+    id_quizz: '',
     timer: 0,
   );
 }
