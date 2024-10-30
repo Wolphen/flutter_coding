@@ -62,16 +62,16 @@ class _LoginPageState extends State<LoginPage> {
               child: const Text("Se connecter"),
             ),
           ],
-            
-          ),
-          body: TabBarView(
-            children: [
-              SignUpCard(mongoDBService: mongoDBService), // Passe mongoDBService ici
-              LoginCard(),
-            ],
-          ),
+
+        ),
+        body: TabBarView(
+          children: [
+            SignUpCard(mongoDBService: mongoDBService), // Passe mongoDBService ici
+            LoginCard(),
+          ],
         ),
       ),
+    ),
     );
   }
 }

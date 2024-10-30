@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth/signUp.dart';
-import 'Views/homPage.dart';
 import 'splash_screen.dart';
 import 'bdd/connectToDTB.dart';
 
@@ -24,7 +23,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(), // La première page pour vérifier la connexion

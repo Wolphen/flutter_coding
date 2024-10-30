@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login.dart';
 import '../bdd/connectToDTB.dart';
-import '../Views/homPage.dart';
-
 import 'package:email_validator/email_validator.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -223,16 +221,6 @@ class _SignUpCardState extends State<SignUpCard> {
                       }),
                     ),
                     const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()), // Redirection vers HomePage
-                        );
-                      },
-                      child: Text('Retour à la page d\'accueil'),
-                    ),
-                    SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () => _signUpUser(context),
                       child: const Text('Signup'),
