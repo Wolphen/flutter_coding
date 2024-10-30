@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login.dart';
 import '../bdd/connectToDTB.dart';
+import 'package:email_validator/email_validator.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -18,12 +19,12 @@ class _SignUpPageState extends State<SignUpPage> {
   void initState() {
     super.initState();
     mongoDBService = MongoDBService();
-    mongoDBService.connect(); // Connexion à MongoDB au lancement
+    mongoDBService.connect();
   }
 
   @override
   void dispose() {
-    mongoDBService.close(); // Ferme la connexion lors de la destruction du widget
+    mongoDBService.close();
     super.dispose();
   }
 
@@ -33,7 +34,7 @@ class _SignUpPageState extends State<SignUpPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('SignUp'),
+          title: const Text('SignUp'),
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Login'),
@@ -44,7 +45,7 @@ class _SignUpPageState extends State<SignUpPage> {
         body: TabBarView(
           children: [
             SignUpCard(mongoDBService: mongoDBService),
-            LoginPage(),
+            const LoginPage(),
           ],
         ),
       ),
@@ -63,8 +64,16 @@ class DropDownButton with ChangeNotifier {
 
 const List<String> list = <String>['Poursuite d\'étude', 'Réorientation', 'Reconversion'];
 
-class SignUpCard extends StatelessWidget {
+class SignUpCard extends StatefulWidget {
   final MongoDBService mongoDBService;
+
+  const SignUpCard({super.key, required this.mongoDBService});
+
+  @override
+  _SignUpCardState createState() => _SignUpCardState();
+}
+
+class _SignUpCardState extends State<SignUpCard> {
   final GlobalKey<FormState> _signUpFormKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final prenomController = TextEditingController();
@@ -73,13 +82,23 @@ class SignUpCard extends StatelessWidget {
   final ageController = TextEditingController();
   final adresseController = TextEditingController();
 
-  SignUpCard({required this.mongoDBService});
+  double passwordStrength = 0.0;
 
   void _signUpUser(BuildContext context) async {
     if (_signUpFormKey.currentState!.validate()) {
+      String email = emailController.text;
+
+      bool emailAlreadyExists = await widget.mongoDBService.emailExists(email);
+
+      if (emailAlreadyExists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Cet email est déjà utilisé")),
+        );
+        return;
+      }
+
       String nom = nameController.text;
       String prenom = prenomController.text;
-      String email = emailController.text;
       String password = passwordController.text;
       int age = int.tryParse(ageController.text) ?? 0;
       int adressePostale = int.tryParse(adresseController.text) ?? 0;
@@ -96,15 +115,31 @@ class SignUpCard extends StatelessWidget {
         'motivation': motivation,
       };
 
-      // Appel de la fonction d'insertion dans MongoDB
-      await mongoDBService.insertUser(documentToInsert);
+      await widget.mongoDBService.insertUser(documentToInsert);
       print("Inscription réussie pour l'utilisateur : $nom");
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
+      nameController.clear();
+      prenomController.clear();
+      emailController.clear();
+      passwordController.clear();
+      ageController.clear();
+      adresseController.clear();
+
+      DefaultTabController.of(context).animateTo(1); // Bascule vers l'onglet Login
     }
+  }
+
+  void checkPasswordStrength(String password) {
+    double strength = 0;
+
+    if (password.length >= 8) strength += 0.25;
+    if (RegExp(r"[A-Z]").hasMatch(password)) strength += 0.25;
+    if (RegExp(r"[a-z]").hasMatch(password)) strength += 0.25;
+    if (RegExp(r"[0-9]").hasMatch(password)) strength += 0.25;
+
+    setState(() {
+      passwordStrength = strength;
+    });
   }
 
   @override
@@ -118,43 +153,59 @@ class SignUpCard extends StatelessWidget {
             child: Form(
               key: _signUpFormKey,
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     TextFormField(
                       controller: nameController,
-                      decoration: InputDecoration(labelText: 'Nom'),
+                      decoration: const InputDecoration(labelText: 'Nom'),
+                      validator: (value) => value!.isEmpty ? 'Nom requis' : null,
                     ),
+                    const SizedBox(height: 10),
                     TextFormField(
                       controller: prenomController,
-                      decoration: InputDecoration(labelText: 'Prénom'),
+                      decoration: const InputDecoration(labelText: 'Prénom'),
+                      validator: (value) => value!.isEmpty ? 'Prénom requis' : null,
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextFormField(
                       controller: emailController,
-                      decoration: InputDecoration(labelText: 'Email'),
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Email requis';
+                        if (!EmailValidator.validate(value)) return 'Email invalide';
+                        return null;
+                      },
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextFormField(
                       controller: passwordController,
-                      decoration: InputDecoration(labelText: 'Password'),
+                      decoration: const InputDecoration(labelText: 'Mot de passe'),
                       obscureText: true,
+                      onChanged: checkPasswordStrength,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Mot de passe requis';
+                        if (passwordStrength < 1) return 'Mot de passe faible';
+                        return null;
+                      },
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 5),
+                    LinearProgressIndicator(value: passwordStrength, minHeight: 6),
+                    const SizedBox(height: 10),
                     TextFormField(
                       controller: ageController,
-                      decoration: InputDecoration(labelText: 'Age'),
+                      decoration: const InputDecoration(labelText: 'Age'),
                       keyboardType: TextInputType.number,
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextFormField(
                       controller: adresseController,
-                      decoration: InputDecoration(labelText: 'Adresse Postale'),
+                      decoration: const InputDecoration(labelText: 'Adresse Postale'),
                       keyboardType: TextInputType.number,
                     ),
-                    SizedBox(height: 20),
-                    Text('Motivation'),
+                    const SizedBox(height: 10),
+                    const Text('Situation'),
                     Column(
                       children: List.generate(list.length, (index) {
                         return RadioListTile<int>(
@@ -169,10 +220,10 @@ class SignUpCard extends StatelessWidget {
                         );
                       }),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () => _signUpUser(context),
-                      child: Text('Signup'),
+                      child: const Text('Signup'),
                     ),
                   ],
                 ),
