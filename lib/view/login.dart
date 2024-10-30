@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'signUp.dart';
-import '../bdd/connectToDTB.dart';
+import '../connectToDTB.dart';
+import 'profile.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,6 +35,18 @@ class _LoginPageState extends State<LoginPage> {
               SignUpCard(mongoDBService: mongoDBService), // Passe mongoDBService ici
               LoginCard(),
             ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserProfilePage(userId: '672108069258caa56a000000'), // Redirige vers la page UserProfile avec un userId fictif à remplacer par l'id de l'utilisateur connecté avec la Session
+                ),
+              );
+            },
+            child: Icon(Icons.person),
           ),
         ),
       ),

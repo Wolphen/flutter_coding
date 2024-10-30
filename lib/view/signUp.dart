@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login.dart';
-import '../bdd/connectToDTB.dart';
+import '../connectToDTB.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});

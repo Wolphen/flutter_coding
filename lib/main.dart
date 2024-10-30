@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:provider/provider.dart';
-import 'auth/login.dart';
-import 'auth/signUp.dart';
-import 'bdd/connectToDTB.dart';
+import 'view/login.dart';
+import 'view/signUp.dart';
+import 'connectToDTB.dart';
 
 void main() {
   runApp(
