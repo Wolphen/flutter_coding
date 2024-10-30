@@ -79,34 +79,40 @@ Widget build(BuildContext context) {
 
   Widget _buildQuestion(BuildContext context, Question question) {
     return Card(
-      child: Column(
-        children: [
-          TextField(
-            controller: TextEditingController(text: question.texte),
-            decoration: const InputDecoration(labelText: 'Nom'),
-          ),
-          TextField(
-            controller: TextEditingController(text: question.timer.toString()),
-            decoration: const InputDecoration(labelText: 'Timer'),
-            keyboardType: TextInputType.number,
-          ),
-          TextField(
-            controller: TextEditingController(text: question.reponses![0].texte),
-          decoration: const InputDecoration(labelText: 'Réponse 1'),
-          ),
-          TextField(
-            controller: TextEditingController(text: question.reponses![1].texte),
-            decoration: const InputDecoration(labelText: 'Réponse 2'),
-          ),
-          TextField(
-            controller: TextEditingController(text: question.reponses![2].texte),
-            decoration: const InputDecoration(labelText: 'Réponse 3'),
-          ),
-          TextField(
-            controller: TextEditingController(text: question.reponses![3].texte),
-            decoration: const InputDecoration(labelText: 'Réponse 4'),
-          ),
-        ],
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: TextEditingController(text: question.texte),
+              decoration: const InputDecoration(labelText: 'Nom'),
+            ),
+            TextField(
+              controller: TextEditingController(text: question.timer.toString()),
+              decoration: const InputDecoration(labelText: 'Timer'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: TextEditingController(text: question.reponses![0].texte),
+            decoration: const InputDecoration(labelText: 'Réponse 1'),
+            ),
+            TextField(
+              controller: TextEditingController(text: question.reponses![1].texte),
+              decoration: const InputDecoration(labelText: 'Réponse 2'),
+            ),
+            TextField(
+              controller: TextEditingController(text: question.reponses![2].texte),
+              decoration: const InputDecoration(labelText: 'Réponse 3'),
+            ),
+            TextField(
+              controller: TextEditingController(text: question.reponses![3].texte),
+              decoration: const InputDecoration(labelText: 'Réponse 4'),
+            ),
+          ],
+        ),
       ),
     );
   }
