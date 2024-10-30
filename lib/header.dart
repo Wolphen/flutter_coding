@@ -1,52 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_coding/profile.dart';
 import './bdd/session_manager.dart';
 
-class Header extends StatelessWidget implements PreferredSizeWidget {
+class Header extends StatefulWidget implements PreferredSizeWidget {
   final String nom;
   final bool isAdmin;
+  final Object id;
   final VoidCallback onLogout;
 
   const Header({
     Key? key,
     required this.nom,
     required this.isAdmin,
+    required this.id,
     required this.onLogout,
   }) : super(key: key);
 
   @override
+  _HeaderState createState() => _HeaderState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _HeaderState extends State<Header> {
+  @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text("Bienvenue, $nom"),
+      title: Text(widget.nom),
       actions: [
-        if (isAdmin)
+        if (widget.isAdmin)
           IconButton(
-            icon: const Icon(Icons.admin_panel_settings),
-            onPressed: () {
-              // Action pour le bouton Admin (vide pour l'instant)
-            },
+            icon: Icon(Icons.admin_panel_settings),
+            onPressed: () {},
           ),
-        if (isAdmin)
         IconButton(
-          icon: const Icon(Icons.telegram),
+          icon: const Icon(Icons.person),
           onPressed: () {
-            // Action pour le bouton Admin (vide pour l'instant)
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserProfilePage(id: widget.id.toString()),
+              ),
+            );
           },
         ),
-        if (isAdmin)
-          IconButton(
-            icon: const Icon(Icons.umbrella_sharp),
-            onPressed: () {
-              // Action pour le bouton Admin (vide pour l'instant)
-            },
-          ),
         IconButton(
           icon: const Icon(Icons.logout),
-          onPressed: onLogout,
+          onPressed: widget.onLogout,
         ),
       ],
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

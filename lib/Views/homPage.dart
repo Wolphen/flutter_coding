@@ -18,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   //---------------------------Liste des catégories---------------------------//
   late String pseudo;
   late bool isAdmin;
+  late Object id;
 
   void _logout() async {
     await SessionManager.clearToken();
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     pseudo = widget.userInfo['nom'] ?? 'Utilisateur';
     isAdmin = widget.userInfo['admin'] ?? false;
+    id = widget.userInfo['_id'] ?? 'pas d\'id';
     onInit().then((value) {
       setState(() {
         categories = value;
@@ -46,6 +48,7 @@ class _HomePageState extends State<HomePage> {
       appBar: Header(
         nom: pseudo,
         isAdmin: isAdmin,
+        id: id,
         onLogout: _logout,
       ),      body: Center(
         child: isLoading
