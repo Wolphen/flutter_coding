@@ -85,7 +85,7 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
         onPress(context, quizz, widget.userInfo); // Utilisez `widget.userInfo`
       },
       onLongPress: () {
-        onAddQuizz(context, quizz.id!, widget.categorieId);
+        onAddQuizz(context, quizz.id!, widget.categorieId, widget.userInfo);
       },
       child: Card(
         child: Center(
@@ -98,7 +98,7 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
   Widget _buildAddNewQuizzCard() {
     return GestureDetector(
       onTap: () {
-        onAddQuizz(context, "", widget.categorieId);
+        onAddQuizz(context, "", widget.categorieId, widget.userInfo);
       },
       child: const Card(
         child: Center(

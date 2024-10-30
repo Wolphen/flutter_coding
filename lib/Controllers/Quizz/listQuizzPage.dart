@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_coding/Views/Quizz/newQuizz.dart';
 import '../../Models/quizz.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import '../../Views/Quizz/quizzPage.dart';
@@ -16,11 +17,11 @@ void onPress(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) {
   );
 }
 
-void onAddQuizz(BuildContext context, String? quizzId, String categorieId) {
+void onAddQuizz(BuildContext context, String? quizzId, String categorieId, Map<String, dynamic> userInfo) {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId),
+      builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId, userInfo: userInfo),
     ),
   );
 }

@@ -16,23 +16,23 @@ bool editQuestion(BuildContext context) {
 Future<void> onSubmit(Quizz quizz) async {
   for (var question in quizz.questions!) {
     print(question.texte);
+    for (var reponse in question.reponses!) {
+      print(reponse.texte);
+    }
   }
 }
 
-Quizz onInitNew(String quizzId, String categorieId) {
-  Quizz quizz = initQuizz(quizzId, categorieId);
-  quizz.questions = [initQuestion()];
-  for (var question in quizz.questions!) {
-    question.reponses = initReponses();
-  }
+Quizz onInitNew(String categorieId) {
+  Quizz quizz = initQuizz(categorieId);
+  print(quizz);
   return quizz;
 }
 
 
 // Initialisation du quiz
-Quizz initQuizz(String quizzId, String categorieId) {
+Quizz initQuizz(String categorieId) {
   return Quizz(
-    id: quizzId,
+    id: '',
     nom: '',
     id_categ: categorieId,
     questions: [],

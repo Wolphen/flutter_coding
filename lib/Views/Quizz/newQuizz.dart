@@ -26,7 +26,7 @@ class _NewQuizzState extends State<NewQuizz> {
   @override
   void initState() {
     super.initState();
-    quizz = onInitNew(widget.quizzId!, widget.categorieId);
+    quizz = onInitNew(widget.categorieId);
     newQuestion = initQuestion();
     reponses = initReponses();
   }
@@ -117,8 +117,8 @@ class _NewQuizzState extends State<NewQuizz> {
                 setState(() {
                   quizz.questions!.add(question); // Ajouter la question au quiz
                   isEdit = false; // Sortir du mode édition
-                  initQuestion(); // Réinitialiser la question
-                  initReponses(); // Réinitialiser les réponses
+                  newQuestion = initQuestion(); // Réinitialiser la question
+                  reponses = initReponses(); // Réinitialiser les réponses
                 });
               },
               child: const Text('Ajouter la question'),
@@ -154,6 +154,11 @@ class _NewQuizzState extends State<NewQuizz> {
             child: TextField(
               controller: TextEditingController(text: reponse.texte),
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
+              onChanged: (value) {
+                setState(() {
+                  reponse.texte = value; // Mettre à jour le texte de la réponse
+                });
+              },
             ),
           ),
           const SizedBox(width: 10),
