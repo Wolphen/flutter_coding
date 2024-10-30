@@ -13,7 +13,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late String pseudo;
   late String email;
-  late String userId; // ID utilisateur pour lier les données, comme des quiz
+  late String userId;
+  late String admin;
 
   @override
   void initState() {
@@ -22,8 +23,8 @@ class _HomePageState extends State<HomePage> {
     // Initialisation des informations utilisateur depuis `userInfo`
     pseudo = widget.userInfo['nom'] ?? 'Utilisateur';
     email = widget.userInfo['mail'] ?? 'Email non disponible';
-    userId = widget.userInfo['_id']; // ID MongoDB de l'utilisateur pour référencer ce dernier dans d'autres collections
-
+    userId = widget.userInfo['_id'].toString();
+    admin = widget.userInfo['admin'].toString();
 
   }
 
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Text(
-          "Bienvenue, $pseudo",
+          "Bienvenue, $pseudo\n mail : $email \n id : $userId \n admin: $admin",
           style: const TextStyle(fontSize: 24),
         ),
       ),

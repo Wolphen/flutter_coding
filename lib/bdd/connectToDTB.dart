@@ -47,12 +47,13 @@ class MongoDBService {
     print("Document inséré avec succès dans MongoDB !");
   }
 
-  String generateToken(String userId, String nom, String email) {
+  String generateToken(String userId, String nom, String email, String admin) {
     final jwt = JWT(
       {
         'userId': userId,
         'nom': nom,       // Ajout du nom (ou pseudo)
         'mail': email,
+        'admin': admin,
       },
     );
     return jwt.sign(SecretKey(_secretKey), expiresIn: const Duration(hours: 2));
@@ -62,7 +63,7 @@ class MongoDBService {
     await ensureConnected();
     final user = await userCollection!.findOne({"mail": email.trim()});
     if (user != null && user['password'] == password.trim()) {
-      final token = generateToken(user['_id'].toString(), user['nom'], user['mail']);
+      final token = generateToken(user['_id'].toString(), user['nom'], user['mail'], user['admin'].toString());
       print("Token généré pour l'utilisateur $email : $token");
       return {
         "token": token,

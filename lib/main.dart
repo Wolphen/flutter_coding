@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth/signUp.dart';
-import 'splash_screen.dart'; // Nouvelle page d'accueil pour la vérification
+import 'splash_screen.dart';
 import 'bdd/connectToDTB.dart';
 
 void main() {
