@@ -72,15 +72,19 @@ Widget build(BuildContext context) {
                   crossAxisSpacing: 10.0,
                   mainAxisSpacing: 10.0,
                 ),
-                itemCount: quizz.length,
+                itemCount: quizz.length + 1, // Added +1 for the add new quizz card
                 itemBuilder: (context, index) {
-                  return _buildCard(quizz[index], index);
+                  if (index < quizz.length) {
+                    return _buildCard(quizz[index], index);
+                  } else {
+                    return _buildAddNewQuizzCard();
+                  }
                 },
               ),
             ),
-            ],
+          ],
           ),
-      ),
+        ),
     );
   }
 
@@ -92,9 +96,25 @@ Widget build(BuildContext context) {
       onTap: () {
         onPress(context, quizz);
       },
+      onLongPress: () {
+        onAddQuizz(context, quizz.id!, widget.categorieId);
+      },
       child: Card(
         child: Center(
           child: Text(quizz.nom),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddNewQuizzCard() {
+    return GestureDetector(
+      onTap: () {
+        onAddQuizz(context, "", widget.categorieId);
+      },
+      child: const Card(
+        child: Center(
+          child: Icon(Icons.add),
         ),
       ),
     );

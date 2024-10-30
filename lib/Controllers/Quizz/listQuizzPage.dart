@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import '../../Models/quizz.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import '../../Views/Quizz/quizzPage.dart';
-
+import '../../Views/Quizz/newQuizz/newQuizz.dart';
   
 void onPress(BuildContext context, Quizz quizz) {
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => QuizzPage(quizzId: quizz.id, quizzNom: quizz.nom)),
+    MaterialPageRoute(builder: (context) => QuizzPage(quizzId: quizz.id!, quizzNom: quizz.nom)),
+  );
+}
+
+void onAddQuizz(BuildContext context, String quizzId, String categorieId) {
+    Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId)),
   );
 }
 

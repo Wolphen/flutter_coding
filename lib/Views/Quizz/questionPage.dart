@@ -129,7 +129,7 @@ class _QuestionPageState extends State<QuestionPage> {
         spacing: 10.0,
         runSpacing: 10.0,
         alignment: WrapAlignment.center,
-        children: questions[currentQuestionIndex].reponses.map((reponse) {
+        children: questions[currentQuestionIndex].reponses!.map((reponse) {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.4,
             child: ElevatedButton(
