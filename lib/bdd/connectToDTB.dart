@@ -3,7 +3,7 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import '../../../Models/quizz.dart';
 import '../../../Models/question.dart';
 import '../../../Models/reponse.dart';
-
+import '../../../Models/note.dart';
 class MongoDBService {
   late mongo.Db db;
   mongo.DbCollection? userCollection; // Rendre userCollection nullable
@@ -165,5 +165,46 @@ class MongoDBService {
         print("Reponse inséré avec succès dans MongoDB !");
       }
     }
+  }
+
+  
+  Future<List<Quizz>> getListQuizz(String categorieId) async {
+    List<Quizz> listeQuizz = [];
+    await ensureConnected();
+    final collection = db.collection('Quizz');
+    var filter = {'id_categ': mongo.ObjectId.fromHexString(categorieId)};
+    var result = await collection.find(filter).toList();
+    for (var doc in result) {
+        listeQuizz.add(Quizz(id: doc['_id'].toHexString(), nom: doc['nom'], id_categ: doc['id_categ'].toString()));
+    }
+    return listeQuizz;
+  }
+
+  Future<List<Question>> getListQuestions(String quizzId) async {
+    List<Question> listeQuestions = [];
+    await ensureConnected();
+    final collectionQuestion = db.collection('Question');
+    var filter = {'id_quizz': mongo.ObjectId.fromHexString(quizzId)};
+    var questions = await collectionQuestion.find(filter).toList();
+    for (var question in questions) {
+      List<Reponse> listeReponses = [];
+      final collectionReponse = db.collection('Reponse');
+      var filterReponse = {'id_qu': mongo.ObjectId.fromHexString(question['_id'].toHexString())};
+      var reponses = await collectionReponse.find(filterReponse).toList();
+      for (var reponse in reponses) {
+        listeReponses.add(Reponse(id: reponse['_id'].toHexString(), id_qu: reponse['id_qu'].toHexString(), texte: reponse['texte'], is_correct: reponse['is_correct']));
+      }
+      listeQuestions.add(Question(id: question['_id'].toHexString(), id_quizz: question['id_quizz'].toHexString(), texte: question['texte'], timer: question['timer'], reponses: listeReponses));
+    }
+  return listeQuestions;
+  }
+
+  Future<void> saveResult(int score, List<Question> questions, Map<String, dynamic> userInfo) async {
+    await ensureConnected();
+    print(userInfo['id']);
+    final collectionNote = db.collection('Note');
+    var note = Note(id_quiz: questions[0].id_quizz, id_user: userInfo['id'], score: score);
+    await collectionNote.insertOne(note.toJson());
+    print('Note enregistrée avec succès');
   }
 }

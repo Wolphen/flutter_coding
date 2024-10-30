@@ -18,21 +18,17 @@ class ListeQuizzPage extends StatefulWidget {
 
 class _ListeQuizzPageState extends State<ListeQuizzPage> {
   List<Quizz> quizz = [];
-  bool isLoading = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _initQuizzes();
-  }
-
-  void _initQuizzes() {
-    quizz = [
-      Quizz(id: "1", nom: "Quizz 1", id_categ: widget.categorieId),
-      Quizz(id: "2", nom: "Quizz 2", id_categ: widget.categorieId),
-      Quizz(id: "3", nom: "Quizz 3", id_categ: widget.categorieId),
-      Quizz(id: "4", nom: "Quizz 4", id_categ: widget.categorieId),
-    ];
+    listQuizz(widget.categorieId).then((value) {
+      setState(() {
+        quizz = value;
+        isLoading = false;
+      });
+    });
   }
 
   @override

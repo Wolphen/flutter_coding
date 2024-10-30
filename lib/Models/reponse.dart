@@ -5,6 +5,7 @@ class Reponse {
   String? id_qu;
   String texte;
   bool is_correct;
+  bool isSelected = false;
 
   Reponse({
     this.id,

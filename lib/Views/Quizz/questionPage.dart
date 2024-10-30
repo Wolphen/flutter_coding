@@ -2,20 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '../../Models/question.dart';
-import '../../Models/reponse.dart';
 import '../../Controllers/Quizz/questionPage.dart';
 import '../../Views/homPage.dart';
 
 class QuestionPage extends StatefulWidget {
   final String quizzId;
   final String quizzNom;
-  final Map<String, dynamic> userInfo; // Ajoutez ce paramètre pour userInfo
+  final Map<String, dynamic> userInfo;
 
   const QuestionPage({
     Key? key,
     required this.quizzId,
     required this.quizzNom,
-    required this.userInfo, // Ajoutez ce paramètre
+    required this.userInfo,
   }) : super(key: key);
 
   @override
@@ -25,60 +24,28 @@ class QuestionPage extends StatefulWidget {
 class _QuestionPageState extends State<QuestionPage> {
 
   //---------------------------Liste des questions---------------------------//
-  // List<Question> questions = [];
-  // bool isLoading = true;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   onInit(widget.quizzId).then((value) {
-  //     setState(() {
-  //       questions = value;
-  //       isLoading = false;
-  //     });
-  //   });
-  // }
-  // @override
   int currentQuestionIndex = 0;
   int score = 0;
   List<Question> questions = [];
-  bool isLoading = false;
+  bool isLoading = true;
+  bool isValidate = false;
+  bool revealAnswer = false;
+
   @override
   void initState() {
     super.initState();
-    _initQuestions();
-    _startTimer();
+    getListQuestions(widget.quizzId).then((value) {
+      setState(() {
+        _startTimer();
+        questions = value;
+        isLoading = false;
+      });
+    });
   }
-  void _initQuestions() {
-    questions = [
-      Question(id: "1", id_quizz: widget.quizzId, texte: "Question 1", timer: 10, reponses: [
-      Reponse(id: "1", id_qu: "1", texte: "Reponse 1", is_correct: true),
-      Reponse(id: "2", id_qu: "1", texte: "Reponse 2", is_correct: false),
-      Reponse(id: "3", id_qu: "1", texte: "Reponse 3", is_correct: false),
-      Reponse(id: "4", id_qu: "1", texte: "Reponse 4", is_correct: false),
-    ]),
-    Question(id: "2", id_quizz: widget.quizzId, texte: "Question 2", timer: 10, reponses: [
-      Reponse(id: "5", id_qu: "2", texte: "Reponse 5", is_correct: true),
-      Reponse(id: "6", id_qu: "2", texte: "Reponse 6", is_correct: false),
-      Reponse(id: "7", id_qu: "2", texte: "Reponse 7", is_correct: false),
-      Reponse(id: "8", id_qu: "2", texte: "Reponse 8", is_correct: false),
-    ]),
-    Question(id: "3", id_quizz: widget.quizzId, texte: "Question 3", timer: 10, reponses: [
-      Reponse(id: "9", id_qu: "3", texte: "Reponse 9", is_correct: true),
-      Reponse(id: "10", id_qu: "3", texte: "Reponse 10", is_correct: false),
-      Reponse(id: "11", id_qu: "3", texte: "Reponse 11", is_correct: false),
-      Reponse(id: "12", id_qu: "3", texte: "Reponse 12", is_correct: false),
-    ]),
-    Question(id: "4", id_quizz: widget.quizzId, texte: "Question 4", timer: 10, reponses: [
-      Reponse(id: "13", id_qu: "4", texte: "Reponse 13", is_correct: true),
-      Reponse(id: "14", id_qu: "4", texte: "Reponse 14", is_correct: false),
-      Reponse(id: "15", id_qu: "4", texte: "Reponse 15", is_correct: false),
-      Reponse(id: "16", id_qu: "4", texte: "Reponse 16", is_correct: false),
-    ]),
-    ];
-  }
+  void _onAnswerValidate() {
+    revealAnswer = true;
+    bool isCorrect = questions[currentQuestionIndex].reponses!.any((reponse) => reponse.isSelected && reponse.is_correct);
 
-  void _onAnswerSelected(bool isCorrect) {
     if (isCorrect) {
       score++;
     }
@@ -128,7 +95,7 @@ class _QuestionPageState extends State<QuestionPage> {
                         Text("Score: $score/${questions.length}", style: const TextStyle(fontSize: 24)),
                         ElevatedButton(
                           onPressed: () {
-                            saveResult(score, questions);
+                            saveResult(score, questions, widget.userInfo);
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -170,41 +137,60 @@ class _QuestionPageState extends State<QuestionPage> {
         children: questions[currentQuestionIndex].reponses!.map((reponse) {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.4,
-            child: ElevatedButton(
-              onPressed: () => _onAnswerSelected(reponse.is_correct),
-              child: Text(reponse.texte),
+            child: CheckboxListTile(
+              title: Text(reponse.texte),
+              value: reponse.isSelected,
+              onChanged: (bool? value) {
+                setState(() {
+                  reponse.isSelected = value!;
+                });
+              },
             ),
           );
         }).toList(),
       ),
       const SizedBox(height: 20),
-      ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-        ),
-        onPressed: () => showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Confirmation'),
-              content: const Text('Êtes-vous sûr de vouloir quitter le quizz ?'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Annuler'),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                TextButton(
-                  child: const Text('Confirmer'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    onPressed(context, widget.userInfo); // Utilisez widget.userInfo ici
-                  },
-                ),
-              ],
-            );
-          },
-        ),
-        child: const Text("Quitter"),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            ),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Confirmation'),
+                  content: const Text('Êtes-vous sûr de vouloir quitter le quizz ?'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Annuler'),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    TextButton(
+                      child: const Text('Confirmer'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onPressed(context, widget.userInfo); // Utilisez widget.userInfo ici
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+            child: const Text("Quitter"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            ),
+            onPressed: () {
+              _onAnswerValidate();
+            },
+            child: const Text("Valider"),
+          ),
+        ],
       ),
     ],
   );

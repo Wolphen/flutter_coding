@@ -37,7 +37,6 @@ class _QuizzPageState extends State<QuizzPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Passez `userInfo` ici
                 onPress(context, widget.quizzId, widget.quizzNom, widget.userInfo);
               },
               child: const Text('Commencer'),
