@@ -17,6 +17,7 @@ class QuestionPage extends StatefulWidget {
 
 class _QuestionPageState extends State<QuestionPage> {
 
+  //---------------------------Liste des questions---------------------------//
   // List<Question> questions = [];
   // bool isLoading = true;
 
@@ -31,7 +32,6 @@ class _QuestionPageState extends State<QuestionPage> {
   //   });
   // }
   // @override
-  //---------------------------Liste des questions---------------------------//
   int currentQuestionIndex = 0;
   int score = 0;
   List<Question> questions = [];
