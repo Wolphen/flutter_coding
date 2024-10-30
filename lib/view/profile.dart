@@ -71,92 +71,82 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void showEditDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        insetPadding: EdgeInsets.symmetric(horizontal: 20),
-        title: Text("Modifier le profil"),
-        content: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.9,
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: nomController,
-                    decoration: InputDecoration(labelText: 'Nom'),
-                    validator: (value) => value!.isEmpty ? 'Entrez un nom' : null,
-                    onSaved: (value) {
-                      user!['nom'] = value;
-                    },
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
+            insetPadding: EdgeInsets.symmetric(horizontal: 20),
+            title: Text("Modifier le profil"),
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: nomController,
+                        decoration: InputDecoration(labelText: 'Nom'),
+                        validator: (value) => value!.isEmpty ? 'Entrez un nom' : null,
+                      ),
+                      TextFormField(
+                        controller: prenomController,
+                        decoration: InputDecoration(labelText: 'Prénom'),
+                        validator: (value) => value!.isEmpty ? 'Entrez un prénom' : null,
+                      ),
+                      TextFormField(
+                        controller: mailController,
+                        decoration: InputDecoration(labelText: 'Email'),
+                        validator: (value) => value!.isEmpty ? 'Entrez un email' : null,
+                      ),
+                      TextFormField(
+                        controller: adressePostaleController,
+                        decoration: InputDecoration(labelText: 'Adresse Postale'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value!.isEmpty ? 'Entrez votre adresse postale' : null,
+                      ),
+                      TextFormField(
+                        controller: ageController,
+                        decoration: InputDecoration(labelText: 'Âge'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value!.isEmpty ? 'Entrez votre âge' : null,
+                      ),
+                      Column(
+                        children: List.generate(list.length, (index) {
+                          return RadioListTile<int>(
+                            title: Text(list[index]),
+                            value: index,
+                            groupValue: selectedMotivation,
+                            onChanged: (int? value) {
+                              setDialogState(() {
+                                selectedMotivation = value;
+                              });
+                            },
+                          );
+                        }),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: ElevatedButton(
+                          child: const Text('Enregistrer'),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              updateUser();
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  TextFormField(
-                    controller: prenomController,
-                    decoration: InputDecoration(labelText: 'Prénom'),
-                    validator: (value) => value!.isEmpty ? 'Entrez un prénom' : null,
-                    onSaved: (value) {
-                      user!['prenom'] = value;
-                    },
-                  ),
-                  TextFormField(
-                    controller: mailController,
-                    decoration: InputDecoration(labelText: 'Email'),
-                    validator: (value) => value!.isEmpty ? 'Entrez un email' : null,
-                    onSaved: (value) {
-                      user!['email'] = value;
-                    },
-                  ),
-                  TextFormField(
-                    controller: adressePostaleController,
-                    decoration: InputDecoration(labelText: 'Adresse Postale'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) => value!.isEmpty ? 'Entrez votre adresse postale' : null,
-                    onSaved: (value) {
-                      user!['adresse_postale'] = value;
-                    },
-                  ),
-                  TextFormField(
-                    controller: ageController,
-                    decoration: InputDecoration(labelText: 'Âge'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) => value!.isEmpty ? 'Entrez votre âge' : null,
-                    onSaved: (value) {
-                      user!['age'] = value;
-                    },
-                  ),
-                  Column(
-                    children: List.generate(list.length, (index) {
-                      return RadioListTile(
-                        title: Text(list[index]),
-                        value: index,
-                        groupValue: selectedMotivation,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedMotivation = value;
-                          });
-                        },
-                      );
-                    }),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: ElevatedButton(
-                      child: const Text('Enregistrer'),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          updateUser();
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,27 +230,61 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             SizedBox(height: 40),
             Divider(thickness: 1.5),
-            /*Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: Text(
                 "Scores de l'utilisateur",
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
             ),
-            Container(
-              height: 150,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center, // Centre les cartes dans la Row
+                children: [
+                  SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: Card(
+                      elevation: 5,
+                      child: Center(
+                        child: Text(
+                          "Java :",
+                          style: TextStyle(fontSize: 20), // Ajuste la taille du texte
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20), // Espace entre les cartes
+                  SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: Card(
+                      elevation: 5,
+                      child: Center(
+                        child: Text(
+                          "HTML/CSS :",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: Card(
+                      elevation: 5,
+                      child: Center(
+                        child: Text(
+                          "Algo :",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: Center(
-                child: Text(
-                  "L'utilisateur n'a pas de scores",
-                  style: TextStyle(fontSize: 18, color: Colors.black54),
-                ),
-              ),
-            ),*/
+            )
           ],
         ),
       ),
