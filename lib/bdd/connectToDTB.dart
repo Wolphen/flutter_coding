@@ -1,5 +1,8 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import '../../../Models/quizz.dart';
+import '../../../Models/question.dart';
+import '../../../Models/reponse.dart';
 
 class MongoDBService {
   late mongo.Db db;
@@ -92,5 +95,57 @@ class MongoDBService {
     _isConnected = false;
     userCollection = null;
     print('Connexion à MongoDB fermée.');
+  }
+
+  Future<Quizz> detailsQuizz(String quizzId, String categorieId) async {
+    Quizz quizz = Quizz(id: quizzId, nom: "", id_categ: categorieId);
+    await ensureConnected();
+    final collectionQuizz = db.collection('Quizz');
+    final filter = {'id': quizzId};
+    final result = await collectionQuizz.find(filter).toList();
+    for (var doc in result) {
+      final questions = await fetchQuestions(db, quizzId);
+      quizz = Quizz(
+        id: doc['id'].toString(),
+        nom: doc['nom'],
+        id_categ: doc['id_categ'].toString(),
+        questions: questions,
+      );
+    }
+    return quizz;
+  }
+
+  Future<List<Question>> fetchQuestions(mongo.Db db, String quizzId) async {
+    List<Question> questions = [];
+    final collectionQuestion = db.collection('Question');
+    final filterQuestion = {'id_quizz': quizzId};
+    final resultQuestion = await collectionQuestion.find(filterQuestion).toList();
+    for (var docQuestion in resultQuestion) {
+      final reponses = await fetchReponses(db, docQuestion['id'].toString());
+      questions.add(Question(
+        id: docQuestion['id'].toString(),
+        id_quizz: docQuestion['id_quizz'].toString(),
+        texte: docQuestion['texte'],
+        timer: docQuestion['timer'],
+        reponses: reponses,
+      ));
+    }
+    return questions;
+  }
+
+  Future<List<Reponse>> fetchReponses(mongo.Db db, String questionId) async {
+    List<Reponse> reponses = [];
+    final collectionReponse = db.collection('Reponse');
+    final filterReponse = {'id_qu': questionId};
+    final resultReponse = await collectionReponse.find(filterReponse).toList();
+    for (var docReponse in resultReponse) {
+      reponses.add(Reponse(
+        id: docReponse['id'].toString(),
+        id_qu: docReponse['id_qu'].toString(),
+        texte: docReponse['texte'],
+        is_correct: docReponse['is_correct'],
+      ));
+    }
+    return reponses;
   }
 }
