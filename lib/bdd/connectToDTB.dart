@@ -24,14 +24,19 @@ class MongoDBService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final collection = db.collection('Categorie');
+    final categories = await collection.find().toList();
+    return categories.map((category) => category as Map<String, dynamic>).toList();
+  }
+
   Future<void> updateUser(Map<String, dynamic> document, String id) async {
     print("UpdateUser en cours");
 
     if (!_isConnected) {
       await connect();
     }
-
-    // Nettoie l'ID pour qu'il ne contienne que la partie hexadécimale
+    // Nettoie l'Object id pour qu'il ne contienne que la partie décimale
     final match = RegExp(r'ObjectId\("([a-fA-F0-9]{24})"\)').firstMatch(id);
     final cleanedId = match != null ? match.group(1) : id;  // Si l'ID est déjà propre, on l'utilise tel quel
 
@@ -55,14 +60,12 @@ class MongoDBService {
     }
   }
 
-
   Future<Map<String, dynamic>?> findUserById(String id) async {
     print("ID reçu dans findUserById: $id");  // Affiche l'ID reçu
 
     if (!_isConnected) {
       await connect();
     }
-
     // Vérifie que userCollection n'est pas null
     if (userCollection == null) {
       print("userCollection est null. Assurez-vous que la connexion à MongoDB a réussi.");
@@ -85,8 +88,6 @@ class MongoDBService {
       return null;
     }
   }
-
-
   bool isConnected() {
     return _isConnected;
   }
@@ -94,7 +95,7 @@ class MongoDBService {
   // Attendre que la connexion soit établie et que userCollection soit initialisé
   Future<void> ensureConnected() async {
     if (!_isConnected || userCollection == null) {
-      await connect(); // Appel de connect si non connecté
+      await connect();
     }
   }
 
@@ -149,6 +150,7 @@ class MongoDBService {
       return false;
     }
   }
+
 
   Future<void> close() async {
     await db.close();

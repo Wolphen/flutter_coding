@@ -89,6 +89,7 @@ class _HomePageState extends State<HomePage> {
     Colors.green, // Couleur pour Algorithme
   ];
 
+
   Widget _buildCard(Categorie categorie, int index) {
     return GestureDetector(
       onTap: () {
