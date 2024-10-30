@@ -43,11 +43,12 @@ class SessionManager {
     if (token != null) {
       try {
         final jwt = JWT.verify(token, SecretKey(_secretKey));
+        final id = jwt.payload['_id'] as Object?;
         final nom = jwt.payload['nom'] as String?;
         final email = jwt.payload['mail'] as String?;
         final admin = jwt.payload['admin'] as bool?;
         if (nom != null && email != null && admin != null) {
-          return {'nom': nom, 'mail': email, 'admin': admin};
+          return {'nom': nom, 'mail': email, 'admin': admin, '_id': id};
         }
       } catch (e) {
         print("Erreur lors de la récupération des informations utilisateur : $e");

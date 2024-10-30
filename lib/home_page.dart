@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late String pseudo;
   late bool isAdmin;
+  late Object id;
 
   @override
   void initState() {
@@ -21,6 +22,7 @@ class _HomePageState extends State<HomePage> {
 
     pseudo = widget.userInfo['nom'] ?? 'Utilisateur';
     isAdmin = widget.userInfo['admin'] ?? false;
+    id = widget.userInfo['_id'].toString();
   }
 
   // Fonction de déconnexion de l'utilisateur
@@ -35,6 +37,7 @@ class _HomePageState extends State<HomePage> {
       appBar: Header(
         nom: pseudo,
         isAdmin: isAdmin,
+        id: id,
         onLogout: _logout,
       ),
       body: Center(

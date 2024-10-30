@@ -27,6 +27,70 @@ class MongoDBService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final collection = db.collection('Categorie');
+    final categories = await collection.find().toList();
+    return categories.map((category) => category as Map<String, dynamic>).toList();
+  }
+
+  Future<void> updateUser(Map<String, dynamic> document, String id) async {
+    print("UpdateUser en cours");
+
+    if (!_isConnected) {
+      await connect();
+    }
+    // Nettoie l'Object id pour qu'il ne contienne que la partie décimale
+    final match = RegExp(r'ObjectId\("([a-fA-F0-9]{24})"\)').firstMatch(id);
+    final cleanedId = match != null ? match.group(1) : id;  // Si l'ID est déjà propre, on l'utilise tel quel
+
+    print("ID nettoyé dans updateUser: $cleanedId");  // Affiche l'ID nettoyé
+
+    try {
+      final objectId = mongo.ObjectId.fromHexString(cleanedId!);
+      await userCollection!.updateOne(
+        mongo.where.eq('_id', objectId),
+        mongo.modify
+            .set('nom', document['nom'])
+            .set('prenom', document['prenom'])
+            .set('mail', document['mail'])
+            .set('age', document['age'])
+            .set('adresse_postale', document['adresse_postale'])
+            .set('motivation', document['motivation']),
+      );
+      print("Mise à jour réussie pour l'utilisateur avec ID $cleanedId");
+    } catch (e) {
+      print("Erreur lors de la conversion de l'ID dans updateUser : $e");
+    }
+  }
+
+  Future<Map<String, dynamic>?> findUserById(String id) async {
+    print("ID reçu dans findUserById: $id");  // Affiche l'ID reçu
+
+    if (!_isConnected) {
+      await connect();
+    }
+    // Vérifie que userCollection n'est pas null
+    if (userCollection == null) {
+      print("userCollection est null. Assurez-vous que la connexion à MongoDB a réussi.");
+      return null;
+    }
+
+    // Nettoie l'ID pour qu'il ne contienne que la partie hexadécimale
+    final match = RegExp(r'ObjectId\("([a-fA-F0-9]{24})"\)').firstMatch(id);
+    final cleanedId = match != null ? match.group(1) : id;  // Si l'ID est déjà propre, on l'utilise tel quel
+
+    print("ID nettoyé dans findUserById: $cleanedId");  // Affiche l'ID nettoyé
+
+    try {
+      final objectId = mongo.ObjectId.fromHexString(cleanedId!); // Utilise uniquement l'ID hexadécimal
+      final user = await userCollection!.findOne({"_id": objectId});
+      print("Utilisateur trouvé : $user");
+      return user;
+    } catch (e) {
+      print("Erreur lors de la conversion de l'ID : $e");
+      return null;
+    }
+  }
   bool isConnected() {
     return _isConnected;
   }
@@ -34,7 +98,7 @@ class MongoDBService {
   // Attendre que la connexion soit établie et que userCollection soit initialisé
   Future<void> ensureConnected() async {
     if (!_isConnected || userCollection == null) {
-      await connect(); // Appel de connect si non connecté
+      await connect();
     }
   }
 
@@ -53,8 +117,8 @@ class MongoDBService {
   String generateToken(String userId, String nom, String email, String admin) {
     final jwt = JWT(
       {
-        'userId': userId,
-        'nom': nom,       // Ajout du nom (ou pseudo)
+        'userId': userId.toString().replaceAll('ObjectId("', '').replaceAll('")', ''), // Utilise uniquement la partie hexadécimale
+        'nom': nom,
         'mail': email,
         'admin': admin,
       },
@@ -89,6 +153,7 @@ class MongoDBService {
       return false;
     }
   }
+
 
   Future<void> close() async {
     await db.close();
