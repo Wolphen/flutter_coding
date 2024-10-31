@@ -62,8 +62,10 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
                 itemBuilder: (context, index) {
                   if (index < quizz.length) {
                     return _buildCard(quizz[index], index);
-                  } else {
+                  } else if (widget.userInfo['admin']) {
                     return _buildAddNewQuizzCard();
+                  } else {
+                    return const SizedBox.shrink();
                   }
                 },
               ),
@@ -81,7 +83,9 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
         onPress(context, quizz, widget.userInfo); // Utilisez `widget.userInfo`
       },
       onLongPress: () {
-        onAddQuizz(context, widget.categorieId, widget.userInfo);
+        if (widget.userInfo['admin']) {
+          onAddQuizz(context, widget.categorieId, widget.userInfo);
+        }
       },
       child: Card(
         child: Center(

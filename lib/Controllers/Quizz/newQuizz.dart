@@ -1,3 +1,5 @@
+import 'package:flutter_coding/Views/Quizz/listQuizzPage.dart';
+
 import '../../Models/quizz.dart';
 import '../../Models/question.dart';
 import '../../Models/reponse.dart';
@@ -14,8 +16,14 @@ bool editQuestion(BuildContext context) {
   return true;
 }
 
-Future<void> onSubmit(Quizz quizz) async {
+Future<void> onSubmit(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) async {
   await MongoDBService().insertQuizz(quizz);
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ListeQuizzPage(userInfo: userInfo, categorieId: quizz.id_categ), // Assurez-vous de fournir userInfo ici
+    ),
+  );
 }
 
 Quizz onInitNew(String categorieId) {

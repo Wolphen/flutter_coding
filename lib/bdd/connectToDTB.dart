@@ -266,9 +266,9 @@ class MongoDBService {
 
   Future<void> saveResult(int score, List<Question> questions, Map<String, dynamic> userInfo) async {
     await ensureConnected();
-    print(userInfo['id']);
+    final userId = userInfo['_id'];
     final collectionNote = db.collection('Note');
-    var note = Note(id_quiz: questions[0].id_quizz, id_user: userInfo['id'], score: score);
+    var note = Note(id_quiz: questions[0].id_quizz, id_user: userId.toHexString(), score: score, date: DateTime.now());
     await collectionNote.insertOne(note.toJson());
     print('Note enregistrée avec succès');
   }

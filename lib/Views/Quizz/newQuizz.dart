@@ -60,7 +60,7 @@ class _NewQuizzState extends State<NewQuizz> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: () => onSubmit(quizz), // Soumettre le quiz
+          onPressed: () => onSubmit(context,quizz, widget.userInfo), // Soumettre le quiz
           child: const Text('Créer', style: TextStyle(fontSize: 18)),
         ),
       ),
