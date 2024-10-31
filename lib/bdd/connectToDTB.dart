@@ -114,6 +114,8 @@ class MongoDBService {
     }
 
     return successRates;
+
+  }
   Future<List<Map<String, dynamic>>> getCategories() async {
     final collection = db.collection('Categorie');
     final categories = await collection.find().toList();
