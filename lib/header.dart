@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_coding/profile.dart';
+import './camembert.dart';
+import './bdd/session_manager.dart';
+
 
 class Header extends StatefulWidget implements PreferredSizeWidget {
   final String nom;
@@ -28,6 +31,16 @@ class _HeaderState extends State<Header> {
     return AppBar(
       title: Text(widget.nom),
       actions: [
+        if (widget.isAdmin)
+          IconButton(
+            icon: Icon(Icons.pie_chart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PieChartPage()),
+              );
+            },
+          ),
         if (widget.isAdmin)
           IconButton(
             icon: Icon(Icons.admin_panel_settings),
