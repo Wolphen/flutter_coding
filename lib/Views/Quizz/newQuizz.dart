@@ -21,6 +21,7 @@ class _NewQuizzState extends State<NewQuizz> {
   late Question newQuestion;
   late List<Reponse> reponses;
   final TextEditingController quizzNameController = TextEditingController(); // Contrôleur pour le nom du quiz
+  List<TextEditingController> reponseControllers = []; // Liste des contrôleurs pour les réponses
 
   @override
   void initState() {
@@ -28,8 +29,19 @@ class _NewQuizzState extends State<NewQuizz> {
     quizz = onInitNew(widget.categorieId);
     newQuestion = initQuestion();
     reponses = initReponses();
+
+    // Initialiser les contrôleurs pour chaque réponse
+    reponseControllers = List.generate(reponses.length, (_) => TextEditingController());
   }
 
+  @override
+  void dispose() {
+    quizzNameController.dispose();
+    for (var controller in reponseControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +72,7 @@ class _NewQuizzState extends State<NewQuizz> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: () => onSubmit(context,quizz, widget.userInfo), // Soumettre le quiz
+          onPressed: () => onSubmit(context, quizz, widget.userInfo), // Soumettre le quiz
           child: const Text('Créer', style: TextStyle(fontSize: 18)),
         ),
       ),
@@ -108,7 +120,14 @@ class _NewQuizzState extends State<NewQuizz> {
               onChanged: (value) => question.timer = int.tryParse(value) ?? 0,
             ),
             const SizedBox(height: 10),
-            ...List.generate(4, (index) => _buildAnswerField('Réponse ${index + 1}', reponses[index])),
+            ...List.generate(
+              reponses.length,
+              (index) => _buildAnswerField(
+                'Réponse ${index + 1}', 
+                reponses[index], 
+                reponseControllers[index]
+              ),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -118,6 +137,7 @@ class _NewQuizzState extends State<NewQuizz> {
                   isEdit = false; // Sortir du mode édition
                   newQuestion = initQuestion(); // Réinitialiser la question
                   reponses = initReponses(); // Réinitialiser les réponses
+                  reponseControllers = List.generate(reponses.length, (_) => TextEditingController()); // Réinitialiser les contrôleurs
                 });
               },
               child: const Text('Ajouter la question'),
@@ -144,14 +164,15 @@ class _NewQuizzState extends State<NewQuizz> {
   }
 
   // Construire un champ de réponse
-  Widget _buildAnswerField(String label, Reponse reponse) {
+  Widget _buildAnswerField(String label, Reponse reponse, TextEditingController controller) {
+    controller.text = reponse.texte; // Initialiser le contrôleur avec le texte de la réponse
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Row(
         children: [
           Expanded(
             child: TextField(
-              controller: TextEditingController(text: reponse.texte),
+              controller: controller,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
               onChanged: (value) {
                 setState(() {
@@ -203,4 +224,5 @@ class _NewQuizzState extends State<NewQuizz> {
     );
   }
 }
+
 

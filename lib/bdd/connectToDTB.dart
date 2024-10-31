@@ -123,7 +123,11 @@ class MongoDBService {
     }
 
     return successRates;
+
+
   }
+
+ 
 
   Future<List<Map<String, dynamic>>> getRecentResults() async {
     await ensureConnected();
@@ -444,5 +448,27 @@ class MongoDBService {
       }
     }
     return listeNoteUser;
+  }
+
+  Future<void> editQuizz(Quizz quizz) async {
+    await ensureConnected();
+    await db.collection('Quizz').updateOne({'_id': mongo.ObjectId.fromHexString(quizz.id!)}, mongo.modify.set('nom', quizz.nom));
+    await db.collection('Question').deleteMany({'id_quizz': mongo.ObjectId.fromHexString(quizz.id!)});
+    await db.collection('Reponse').deleteMany({'id_qu': mongo.ObjectId.fromHexString(quizz.questions![0].id!)});
+    for (var question in quizz.questions!) {
+      question.id_quizz = quizz.id!;
+      await db.collection('Question').insertOne(question.toJson());
+      for (var reponse in question.reponses!) {
+        reponse.id_qu = question.id!;
+        await db.collection('Reponse').insertOne(reponse.toJson());
+      }
+    }
+  }
+
+  Future<void> deleteQuizz(String quizzId) async {
+    await ensureConnected();
+    await db.collection('Quizz').deleteOne({'_id': mongo.ObjectId.fromHexString(quizzId)});
+    await db.collection('Question').deleteMany({'id_quizz': mongo.ObjectId.fromHexString(quizzId)});
+    await db.collection('Reponse').deleteMany({'id_qu': mongo.ObjectId.fromHexString(quizzId)});
   }
 }
