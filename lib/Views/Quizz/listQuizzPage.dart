@@ -84,7 +84,7 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
       },
       onLongPress: () {
         if (widget.userInfo['admin']) {
-          onAddQuizz(context, widget.categorieId, widget.userInfo);
+          editQuizz(context, widget.categorieId, quizz, widget.userInfo);
         }
       },
       child: Card(

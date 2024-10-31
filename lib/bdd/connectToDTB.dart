@@ -183,7 +183,7 @@ class MongoDBService {
   Future<List<Question>> fetchQuestions(mongo.Db db, String quizzId) async {
     List<Question> questions = [];
     final collectionQuestion = db.collection('Question');
-    final filterQuestion = {'id_quizz': quizzId};
+    final filterQuestion = {'id_quizz': mongo.ObjectId.fromHexString(quizzId)};
     final resultQuestion = await collectionQuestion.find(filterQuestion).toList();
     for (var docQuestion in resultQuestion) {
       final reponses = await fetchReponses(db, docQuestion['_id'].toHexString());
@@ -201,7 +201,7 @@ class MongoDBService {
   Future<List<Reponse>> fetchReponses(mongo.Db db, String questionId) async {
     List<Reponse> reponses = [];
     final collectionReponse = db.collection('Reponse');
-    final filterReponse = {'id_qu': questionId};
+    final filterReponse = {'id_qu': mongo.ObjectId.fromHexString(questionId)};
     final resultReponse = await collectionReponse.find(filterReponse).toList();
     for (var docReponse in resultReponse) {
       reponses.add(Reponse(
@@ -271,5 +271,34 @@ class MongoDBService {
     var note = Note(id_quiz: questions[0].id_quizz, id_user: userId.toHexString(), score: score, date: DateTime.now());
     await collectionNote.insertOne(note.toJson());
     print('Note enregistrée avec succès');
+  }
+
+  Future<List<Quizz>> getListQuizzByCategorie(String categorieId) async {
+    List<Quizz> listeQuizz = [];
+    await ensureConnected();
+    final collection = db.collection('Quizz');
+    var filter = {'id_categ': mongo.ObjectId.fromHexString(categorieId)};
+    var result = await collection.find(filter).toList();
+    for (var doc in result) {
+      listeQuizz.add(Quizz(id: doc['_id'].toHexString(), nom: doc['nom'], id_categ: doc['id_categ'].toHexString()));
+    }
+    return listeQuizz;
+  }
+
+  Future<List<Note>> getListNoteByQuizz(String categorieId, String userId) async {
+    List<Quizz> listeQuizz = await getListQuizzByCategorie(categorieId);
+    List<Note> listeNoteUser = [];
+    await ensureConnected();
+    final collection = db.collection('Note');
+    var filter = {'id_user': mongo.ObjectId.fromHexString(userId)};
+    var result = await collection.find(filter).toList();
+    for (var note in result) {
+      for (var quizz in listeQuizz) {
+        if (note['id_quiz'].toHexString() == quizz.id) {
+          listeNoteUser.add(Note(id: note['_id'].toHexString(), id_quiz: note['id_quiz'].toHexString(), id_user: note['id_user'].toHexString(), score: note['score'], date: note['date']));
+        }
+      }
+    }
+    return listeNoteUser;
   }
 }
