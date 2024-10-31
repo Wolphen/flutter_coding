@@ -26,27 +26,45 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final TextEditingController adressePostaleController = TextEditingController();
   int? selectedMotivation;
   List<Categorie> categories = [];
+  List averageScores = [];
+  List<Note> notes = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     mongoDBService = MongoDBService();
-    loadUserData();
-    loadCategories();
-    //loadAverageScores();
+    loadUserData().then((_) {
+      loadCategories().then((_) {
+        for (var categorie in categories) {
+          getListNote(categorie.id, widget.id).then((value) {
+            notes = value;
+            print(notes);
+            print('Average scores loaded for category ${categorie.id}');
+            averageScores = notes.map((note) => note.score).toList();
+          });
 
+        }
+      });
+      for (var score in averageScores) {
+        print(score.score);
+        print(score.id_quiz);
+        print(score.id_user);
+        print(score.date);
+      }
+    });
   }
 
-  Future<void> loadCategories() async {
+  Future<List<Categorie>> loadCategories() async {
     final fetchedCategories = await onInit();
     setState(() {
       categories = fetchedCategories;
       isLoading = false;
     });
+    return categories;
   }
 
-  Future<void> loadUserData() async {
+  Future<Map<String, dynamic>?> loadUserData() async {
     final fetchedUser = await mongoDBService.findUserById(widget.id);
     setState(() {
       user = fetchedUser;
@@ -57,15 +75,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       adressePostaleController.text = user?['adresse_postale'].toString() ?? '';
       selectedMotivation = user?['motivation'];
     });
-  }
-
-  List<Note> averageScores = [];
-
-  Future<void> loadAverageScores(String categoryId, String userId) async {
-    final scores = await getListNote(categoryId, userId);
-    setState(() {
-      averageScores = scores;
-    });
+    return user;
   }
 
   Future<void> updateUser() async {

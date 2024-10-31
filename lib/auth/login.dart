@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../bdd/session_manager.dart';
-import 'signUp.dart';
 import '../Views/homPage.dart'; // Assurez-vous de bien importer home_page.dart ici
 import '../bdd/connectToDTB.dart';
 

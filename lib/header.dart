@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_coding/profile.dart';
-import './bdd/session_manager.dart';
 
 class Header extends StatefulWidget implements PreferredSizeWidget {
   final String nom;

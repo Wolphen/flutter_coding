@@ -1,6 +1,5 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'dart:math';
 
 import '../Models/note.dart';
 import '../Models/quizz.dart';
@@ -57,7 +56,7 @@ class MongoDBService {
     List<Note> listeNoteUser = [];
     await ensureConnected();
     final collection = db.collection('Note');
-    var filter = {'id_user': mongo.ObjectId.fromHexString(userId)};
+    var filter = {'id_user': userId};
     var result = await collection.find(filter).toList();
     for (var note in result) {
       for (var quizz in listeQuizz) {
