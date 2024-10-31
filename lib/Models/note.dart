@@ -1,3 +1,6 @@
+// lib/Models/note.dart
+import 'package:mongo_dart/mongo_dart.dart';
+
 class Note {
   String? id;
   String id_quiz;
@@ -15,9 +18,8 @@ class Note {
 
     Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'id_quiz': id_quiz,
-      'id_user': id_user,
+      'id_quiz': ObjectId.fromHexString(id_quiz),
+      'id_user': ObjectId.fromHexString(id_user),
       'score': score,
       'date': date,
     };

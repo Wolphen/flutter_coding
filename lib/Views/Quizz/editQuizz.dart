@@ -3,41 +3,50 @@ import '../../../Models/quizz.dart';
 import '../../Controllers/Quizz/newQuizz.dart';
 import '../../../Models/question.dart';
 import '../../../Models/reponse.dart';
-
-class NewQuizz extends StatefulWidget {
+import '../../../Controllers/Quizz/editQuizz.dart' as editQuizz;
+class EditQuizz extends StatefulWidget {
   final String categorieId;
   final Map<String, dynamic> userInfo; // Ajoutez ce paramètre pour userInfo
-  
-  const NewQuizz({super.key, required this.categorieId, required this.userInfo});
+  final Quizz quizz;
+  const EditQuizz({super.key, required this.categorieId, required this.userInfo, required this.quizz});
 
   @override
-  State<NewQuizz> createState() => _NewQuizzState();
+  State<EditQuizz> createState() => _EditQuizzState();
 }
 
-class _NewQuizzState extends State<NewQuizz> {
-  bool bLoading = true;
+class _EditQuizzState extends State<EditQuizz> {
+  bool isLoading = true;
   bool isEdit = false; // Indique si nous sommes en mode édition
   late Quizz quizz;
   late Question newQuestion;
   late List<Reponse> reponses;
-  final TextEditingController quizzNameController = TextEditingController(); // Contrôleur pour le nom du quiz
+  final TextEditingController quizzNameController = TextEditingController();
+  final TextEditingController reponseController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    quizz = onInitNew(widget.categorieId);
-    newQuestion = initQuestion();
-    reponses = initReponses();
+    editQuizz.detailQuizz(widget.quizz.id!).then((value) {
+      setState(() {
+        quizz = value;
+        newQuestion = editQuizz.initQuestion();
+        reponses = editQuizz.initReponses();
+        isLoading = false;
+        quizzNameController.text = quizz.nom;
+      });
+    });
   }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Créer un nouveau quizz')),
+      appBar: AppBar(title: const Text('Modifier le quizz')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
           children: [
             _QuizForm(
               quizzName: quizz.nom,
@@ -61,7 +70,7 @@ class _NewQuizzState extends State<NewQuizz> {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () => onSubmit(context,quizz, widget.userInfo), // Soumettre le quiz
-          child: const Text('Créer', style: TextStyle(fontSize: 18)),
+          child: const Text('Modifier', style: TextStyle(fontSize: 18)),
         ),
       ),
     );
@@ -151,11 +160,11 @@ class _NewQuizzState extends State<NewQuizz> {
         children: [
           Expanded(
             child: TextField(
-              controller: TextEditingController(text: reponse.texte),
+              controller: reponseController,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
               onChanged: (value) {
                 setState(() {
-                  reponse.texte = value; // Mettre à jour le texte de la réponse
+                  reponse.texte = reponseController.text; // Mettre à jour le texte de la réponse
                 });
               },
             ),

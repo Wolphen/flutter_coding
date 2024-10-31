@@ -18,21 +18,17 @@ class ListeQuizzPage extends StatefulWidget {
 
 class _ListeQuizzPageState extends State<ListeQuizzPage> {
   List<Quizz> quizz = [];
-  bool isLoading = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _initQuizzes();
-  }
-
-  void _initQuizzes() {
-    quizz = [
-      Quizz(id: "1", nom: "Quizz 1", id_categ: widget.categorieId),
-      Quizz(id: "2", nom: "Quizz 2", id_categ: widget.categorieId),
-      Quizz(id: "3", nom: "Quizz 3", id_categ: widget.categorieId),
-      Quizz(id: "4", nom: "Quizz 4", id_categ: widget.categorieId),
-    ];
+    listQuizz(widget.categorieId).then((value) {
+      setState(() {
+        quizz = value;
+        isLoading = false;
+      });
+    });
   }
 
   @override
@@ -66,8 +62,10 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
                 itemBuilder: (context, index) {
                   if (index < quizz.length) {
                     return _buildCard(quizz[index], index);
-                  } else {
+                  } else if (widget.userInfo['admin']) {
                     return _buildAddNewQuizzCard();
+                  } else {
+                    return const SizedBox.shrink();
                   }
                 },
               ),
@@ -85,7 +83,9 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
         onPress(context, quizz, widget.userInfo); // Utilisez `widget.userInfo`
       },
       onLongPress: () {
-        onAddQuizz(context, quizz.id!, widget.categorieId);
+        if (widget.userInfo['admin']) {
+          editQuizz(context, widget.categorieId, quizz, widget.userInfo);
+        }
       },
       child: Card(
         child: Center(
@@ -98,7 +98,7 @@ class _ListeQuizzPageState extends State<ListeQuizzPage> {
   Widget _buildAddNewQuizzCard() {
     return GestureDetector(
       onTap: () {
-        onAddQuizz(context, "", widget.categorieId);
+        onAddQuizz(context, widget.categorieId, widget.userInfo);
       },
       child: const Card(
         child: Center(

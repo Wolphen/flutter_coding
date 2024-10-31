@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_coding/Views/Quizz/newQuizz.dart';
 import '../../Models/quizz.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import '../../Views/Quizz/quizzPage.dart';
-import '../../Views/Quizz/newQuizz/newQuizz.dart';
+import '../../bdd/connectToDTB.dart';
+import '../../Views/Quizz/editQuizz.dart';
 
 void onPress(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) {
   Navigator.push(
@@ -17,33 +18,23 @@ void onPress(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) {
   );
 }
 
-void onAddQuizz(BuildContext context, String? quizzId, String categorieId) {
+void onAddQuizz(BuildContext context, String categorieId, Map<String, dynamic> userInfo) {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => NewQuizz(quizzId: quizzId, categorieId: categorieId),
+      builder: (context) => NewQuizz(categorieId: categorieId, userInfo: userInfo),
     ),
   );
 }
 
-Future<List<Quizz>> onInit(String categorieId) async {
-  List<Quizz> listeQuizz = [];
-  var password = 'root';
-  final encodedPassword = Uri.encodeComponent(password);
-  var db = await mongo.Db.create(
-      'mongodb+srv://root:$encodedPassword@Flutter.d1rxd.mongodb.net/Flutter?retryWrites=true&w=majority&appName=Flutter');
-  try {
-    await db.open();
-    final collection = db.collection('Quizz');
-    var filter = {'id_categ': categorieId};
-    var result = await collection.find(filter).toList();
-    for (var doc in result) {
-      listeQuizz.add(Quizz(id: doc['id'].toString(), nom: doc['nom'], id_categ: doc['id_categ'].toString()));
-    }
-  } catch (e) {
-    print("Échec de la connexion à MongoDB : $e");
-  } finally {
-    await db.close();
-  }
-  return listeQuizz;
+void editQuizz(BuildContext context, String categorieId, Quizz quizz, Map<String, dynamic> userInfo) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => EditQuizz(categorieId: categorieId, userInfo: userInfo, quizz: quizz)),
+  );
+}
+
+Future<List<Quizz>> listQuizz(String categorieId) async {
+  List<Quizz> listQuizz = await MongoDBService().getListQuizz(categorieId);
+  return listQuizz;
 }
