@@ -34,7 +34,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     mongoDBService = MongoDBService();
     loadUserData();
     loadCategories();
-    loadAverageScores();
+    //loadAverageScores();
+
   }
 
   Future<void> loadCategories() async {
@@ -346,7 +347,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Moyenne: ${notes.toStringAsFixed(1)}',
+              'Moyenne: ',
               style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],

@@ -8,6 +8,5 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 Future<List<Note>> getListNote(String categoryId, String userId) async {
   List<Note> notes = await MongoDBService().getListNoteByQuizz(categoryId, userId);
-
   return notes;
 }
