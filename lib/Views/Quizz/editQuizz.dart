@@ -20,7 +20,8 @@ class _EditQuizzState extends State<EditQuizz> {
   late Quizz quizz;
   late Question newQuestion;
   late List<Reponse> reponses;
-  final TextEditingController quizzNameController = TextEditingController(); // Contrôleur pour le nom du quiz
+  final TextEditingController quizzNameController = TextEditingController();
+  final TextEditingController reponseController = TextEditingController();
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _EditQuizzState extends State<EditQuizz> {
         newQuestion = editQuizz.initQuestion();
         reponses = editQuizz.initReponses();
         isLoading = false;
+        quizzNameController.text = quizz.nom;
       });
     });
   }
@@ -158,11 +160,11 @@ class _EditQuizzState extends State<EditQuizz> {
         children: [
           Expanded(
             child: TextField(
-              controller: TextEditingController(text: reponse.texte),
+              controller: reponseController,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
               onChanged: (value) {
                 setState(() {
-                  reponse.texte = value; // Mettre à jour le texte de la réponse
+                  reponse.texte = reponseController.text; // Mettre à jour le texte de la réponse
                 });
               },
             ),
