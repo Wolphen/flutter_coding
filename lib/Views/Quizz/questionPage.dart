@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../Models/question.dart';
 import '../../Controllers/Quizz/questionPage.dart';
 import '../../Views/homPage.dart';
+import '../../Models/reponse.dart';
 
 class QuestionPage extends StatefulWidget {
   final String quizzId;
@@ -30,6 +31,8 @@ class _QuestionPageState extends State<QuestionPage> {
   bool isLoading = true;
   bool isValidate = false;
   bool revealAnswer = false;
+  List<Reponse> reponsesSelected = [];
+  List<Reponse> reponsesCorrect = [];
 
   @override
   void initState() {
@@ -42,9 +45,18 @@ class _QuestionPageState extends State<QuestionPage> {
       });
     });
   }
-  void _onAnswerValidate() {
+  void _onAnswerValidate(Question question) {
+
+    for (Reponse reponse in question.reponses!) {
+      if (reponse.isSelected) {
+        reponsesSelected.add(reponse);
+      }
+      if (reponse.is_correct) {
+        reponsesCorrect.add(reponse);
+      }
+    }
     revealAnswer = true;
-    bool isCorrect = questions[currentQuestionIndex].reponses!.any((reponse) => reponse.isSelected && reponse.is_correct);
+    bool isCorrect = reponsesSelected.length == reponsesCorrect.length && reponsesSelected.every((reponse) => reponsesCorrect.contains(reponse));
 
     if (isCorrect) {
       score++;
@@ -55,6 +67,7 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   void _startTimer() {
+    revealAnswer = false;
     Timer.periodic(Duration(seconds: 1), (timer) {
       if (currentQuestionIndex < questions.length) {
         setState(() {
@@ -186,7 +199,7 @@ class _QuestionPageState extends State<QuestionPage> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
             ),
             onPressed: () {
-              _onAnswerValidate();
+              _onAnswerValidate(questions[currentQuestionIndex]);
             },
             child: const Text("Valider"),
           ),
