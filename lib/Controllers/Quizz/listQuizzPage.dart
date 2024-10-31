@@ -35,7 +35,6 @@ void editQuizz(BuildContext context, String categorieId, Quizz quizz, Map<String
 }
 
 Future<List<Quizz>> listQuizz(String categorieId) async {
-  List<Quizz> listQuizz = [];
-  listQuizz = await MongoDBService().getListQuizz(categorieId);
+  List<Quizz> listQuizz = await MongoDBService().getListQuizz(categorieId);
   return listQuizz;
 }

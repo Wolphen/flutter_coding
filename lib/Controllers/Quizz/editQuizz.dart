@@ -1,5 +1,4 @@
 import 'package:flutter_coding/Views/Quizz/listQuizzPage.dart';
-
 import '../../Models/quizz.dart';
 import '../../Models/question.dart';
 import '../../Models/reponse.dart';
@@ -26,6 +25,10 @@ Future<void> onSubmit(BuildContext context, Quizz quizz, Map<String, dynamic> us
   );
 }
 
+Future<Quizz> detailQuizz(String quizzId) async {
+  Quizz quizz = await MongoDBService().detailQuizz(quizzId);
+  return quizz;
+}
 
 // Initialisation d'une nouvelle question
 Question initQuestion() {
@@ -39,6 +42,6 @@ Question initQuestion() {
 
 // Initialisation des réponses
 List<Reponse> initReponses() {
-    return List.generate(4, (index) => Reponse(id_qu: "", texte: "", is_correct: false));
+    return List.generate(4, (index) => Reponse(id_qu: '', texte: "", is_correct: false));
 }
 

@@ -162,31 +162,31 @@ class MongoDBService {
     print('Connexion à MongoDB fermée.');
   }
 
-  Future<Quizz> detailsQuizz(String quizzId, String categorieId) async {
-    Quizz quizz = Quizz(id: quizzId, nom: "", id_categ: categorieId);
+  Future<Quizz> detailQuizz(String quizzId) async {
+    Quizz quizz = Quizz(id: quizzId, nom: "", id_categ: "");
     await ensureConnected();
     final collectionQuizz = db.collection('Quizz');
     final filter = {'_id': mongo.ObjectId.fromHexString(quizzId)};
-    final result = await collectionQuizz.find(filter).toList();
-    for (var doc in result) {
-      final questions = await fetchQuestions(db, quizzId);
+    final result = await collectionQuizz.findOne(filter);
+    if (result != null) {
+      final questions = await fetchQuestions(quizzId);
       quizz = Quizz(
-        id: doc['_id'].toHexString(),
-        nom: doc['nom'],
-        id_categ: doc['id_categ'].toHexString(),
+        id: result['_id'].toHexString(),
+        nom: result['nom'],
+        id_categ: result['id_categ'].toHexString(),
         questions: questions,
       );
     }
     return quizz;
   }
 
-  Future<List<Question>> fetchQuestions(mongo.Db db, String quizzId) async {
+  Future<List<Question>> fetchQuestions(String quizzId) async {
     List<Question> questions = [];
     final collectionQuestion = db.collection('Question');
     final filterQuestion = {'id_quizz': mongo.ObjectId.fromHexString(quizzId)};
     final resultQuestion = await collectionQuestion.find(filterQuestion).toList();
     for (var docQuestion in resultQuestion) {
-      final reponses = await fetchReponses(db, docQuestion['_id'].toHexString());
+      final reponses = await fetchReponses(docQuestion['_id'].toHexString());
       questions.add(Question(
         id: docQuestion['_id'].toHexString(),
         id_quizz: docQuestion['id_quizz'].toHexString(),
@@ -198,7 +198,7 @@ class MongoDBService {
     return questions;
   }
 
-  Future<List<Reponse>> fetchReponses(mongo.Db db, String questionId) async {
+  Future<List<Reponse>> fetchReponses(String questionId) async {
     List<Reponse> reponses = [];
     final collectionReponse = db.collection('Reponse');
     final filterReponse = {'id_qu': mongo.ObjectId.fromHexString(questionId)};

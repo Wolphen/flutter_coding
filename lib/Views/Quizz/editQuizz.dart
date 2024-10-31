@@ -3,7 +3,7 @@ import '../../../Models/quizz.dart';
 import '../../Controllers/Quizz/newQuizz.dart';
 import '../../../Models/question.dart';
 import '../../../Models/reponse.dart';
-
+import '../../../Controllers/Quizz/editQuizz.dart' as editQuizz;
 class EditQuizz extends StatefulWidget {
   final String categorieId;
   final Map<String, dynamic> userInfo; // Ajoutez ce paramètre pour userInfo
@@ -15,6 +15,7 @@ class EditQuizz extends StatefulWidget {
 }
 
 class _EditQuizzState extends State<EditQuizz> {
+  bool isLoading = true;
   bool isEdit = false; // Indique si nous sommes en mode édition
   late Quizz quizz;
   late Question newQuestion;
@@ -24,9 +25,14 @@ class _EditQuizzState extends State<EditQuizz> {
   @override
   void initState() {
     super.initState();
-    quizz = widget.quizz;
-    newQuestion = initQuestion();
-    reponses = initReponses();
+    editQuizz.detailQuizz(widget.quizz.id!).then((value) {
+      setState(() {
+        quizz = value;
+        newQuestion = editQuizz.initQuestion();
+        reponses = editQuizz.initReponses();
+        isLoading = false;
+      });
+    });
   }
 
 
@@ -36,7 +42,9 @@ class _EditQuizzState extends State<EditQuizz> {
       appBar: AppBar(title: const Text('Modifier le quizz')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
           children: [
             _QuizForm(
               quizzName: quizz.nom,
