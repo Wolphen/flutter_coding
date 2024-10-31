@@ -39,15 +39,16 @@ class MongoDBService {
   Future<void> generateRandomNotes() async {
     await ensureConnected();
     final random = Random();
-    final userIds = List.generate(10, (index) => mongo.ObjectId()); // 10 utilisateurs aléatoires
 
-    // Récupère les catégories
+    // Récupère tous les utilisateurs de la collection User
+    final users = await userCollection!.find().toList();
+
+    // Récupère toutes les catégories
     final categories = await categorieCollection!.find().toList();
 
     for (var categorie in categories) {
       // Crée un quiz pour chaque catégorie
       var quiz = {
-        "id_user": userIds[random.nextInt(userIds.length)], // Utilisateur aléatoire pour le quiz
         "nom": "Quiz for ${categorie["nom"]}",
         "id_categ": categorie["_id"],
       };
@@ -55,15 +56,18 @@ class MongoDBService {
       final quizId = quizInsertResult.id;
       print("Quiz created for category ${categorie["nom"]} with ID: $quizId");
 
-      for (int i = 0; i < 10; i++) {
-        int score = random.nextInt(11); // Note entre 0 et 10
-        var note = {
-          "id_quiz": quizId,
-          "id_user": userIds[random.nextInt(userIds.length)], // Utilisateur aléatoire
-          "score": score,
-        };
-        var noteInsertResult = await notesCollection!.insertOne(note);
-        print("Note created with score $score for quiz $quizId in category ${categorie["nom"]}");
+      for (var user in users) {
+        for (int i = 0; i < 10; i++) {
+          int score = random.nextInt(11) * 10; // Note entre 0 et 100 %
+          var note = {
+            "id_quiz": quizId,
+            "id_user": user['_id'],
+            "score": score,
+            "date": DateTime.now(),
+          };
+          var noteInsertResult = await notesCollection!.insertOne(note);
+          print("Note created with score $score% for user ${user['prenom']} ${user['nom']} in quiz $quizId");
+        }
       }
     }
     print("All notes and quizzes generated successfully!");
@@ -83,14 +87,16 @@ class MongoDBService {
       String categoryName = category['nom'];
 
       // Récupère les quiz pour cette catégorie
-      final quizzes = await quizCollection!.find({"id_categ": category['_id']}).toList();
+      final quizzes = await quizCollection!.find({"id_categ": category['_id']})
+          .toList();
 
       int totalNotes = 0;
       int totalSuccesses = 0;
 
       for (var quiz in quizzes) {
         // Récupère les notes pour chaque quiz
-        final notes = await notesCollection!.find({"id_quiz": quiz['_id']}).toList();
+        final notes = await notesCollection!.find({"id_quiz": quiz['_id']})
+            .toList();
 
         for (var note in notes) {
           int score = note['score'] ?? 0;
@@ -102,7 +108,9 @@ class MongoDBService {
       }
 
       // Calcule le taux de réussite
-      double successRate = totalNotes > 0 ? (totalSuccesses / totalNotes) * 100 : 0;
+      double successRate = totalNotes > 0
+          ? (totalSuccesses / totalNotes) * 100
+          : 0;
       double failureRate = 100 - successRate;
 
       successRates[categoryName] = {
@@ -110,10 +118,57 @@ class MongoDBService {
         'Échec': failureRate,
       };
 
-      print("Category: $categoryName, Success Rate: $successRate%, Failure Rate: $failureRate%");
+      print(
+          "Category: $categoryName, Success Rate: $successRate%, Failure Rate: $failureRate%");
     }
 
     return successRates;
+  }
+
+  Future<List<Map<String, dynamic>>> getRecentResults() async {
+    await ensureConnected();
+
+    // Utilisation de l'agrégation pour trier et limiter les résultats récents
+    var notes = await notesCollection!.aggregateToStream([
+      {
+        '\$sort': {'date': -1}  // Tri par date décroissante
+      },
+      {
+        '\$limit': 100  // Limitation à 100 résultats
+      }
+    ]).toList();
+
+    List<Map<String, dynamic>> results = [];
+
+    for (var note in notes) {
+      // Récupération des informations de l'utilisateur
+      var user = await userCollection!.findOne({'_id': note['id_user']});
+
+      // Récupération des informations du quiz
+      var quiz = await quizCollection!.findOne({'_id': note['id_quiz']});
+
+      // Vérification et extraction de l'année à partir de la date
+      String annee = "N/A";
+      if (note['date'] != null) {
+        if (note['date'] is DateTime) {
+          annee = note['date'].year.toString();
+        } else if (note['date'] is String) {
+          annee = DateTime.parse(note['date']).year.toString();
+        }
+      }
+
+      // Construction du résultat avec les informations obtenues
+      results.add({
+        'nom': user?['nom'] ?? 'Nom inconnu',
+        'prenom': user?['prenom'] ?? 'Prénom inconnu',
+        'score': note['score'] ?? 0,
+        'annee': annee,
+      });
+    }
+
+    return results;
+  }
+
   Future<List<Map<String, dynamic>>> getCategories() async {
     final collection = db.collection('Categorie');
     final categories = await collection.find().toList();
@@ -321,7 +376,7 @@ class MongoDBService {
     }
   }
 
-  
+
   Future<List<Quizz>> getListQuizz(String categorieId) async {
     List<Quizz> listeQuizz = [];
     await ensureConnected();
