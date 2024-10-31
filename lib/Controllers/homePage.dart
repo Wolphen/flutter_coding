@@ -9,7 +9,7 @@ void onPress(BuildContext context, Categorie categorie, Map<String, dynamic> use
     MaterialPageRoute(
       builder: (context) => ListeQuizzPage(
         categorieId: categorie.id,
-        userInfo: userInfo, // Passez `userInfo` ici
+        userInfo: userInfo,
       ),
     ),
   );

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_coding/Models/note.dart';
 import './bdd/connectToDTB.dart';
 import './auth/signUp.dart';
 import './Controllers/homePage.dart';
 import 'Models/categorie.dart';
+import './Controllers/listNote.dart';
 
 class UserProfilePage extends StatefulWidget {
   final String id;
@@ -32,6 +34,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     mongoDBService = MongoDBService();
     loadUserData();
     loadCategories();
+    loadAverageScores();
   }
 
   Future<void> loadCategories() async {
@@ -55,8 +58,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
   }
 
+  List<Note> averageScores = [];
+
+  Future<void> loadAverageScores(String categoryId, String userId) async {
+    final scores = await getListNote(categoryId, userId);
+    setState(() {
+      averageScores = scores;
+    });
+  }
+
   Future<void> updateUser() async {
-    // Créer un document avec les données mises à jour
     Map<String, dynamic> updatedUser = {
       'nom': nomController.text,
       'prenom': prenomController.text,
@@ -66,7 +77,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       'motivation': selectedMotivation,
     };
 
-    // Utiliser `widget.id` pour l'ID utilisateur
     try {
       await mongoDBService.updateUser(updatedUser, widget.id);
       Navigator.of(context).pop();
@@ -319,18 +329,29 @@ class _UserProfilePageState extends State<UserProfilePage> {
   ];
 
   Widget _buildCard(Categorie categorie) {
+
     return SizedBox(
       width: 400,
       height: 300,
       child: Card(
         color: buttonColors[categories.indexOf(categorie) %
             buttonColors.length],
-        child: Text(
-            categorie.nom,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-            textAlign: TextAlign.center,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              categorie.nom,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Moyenne: ${notes.toStringAsFixed(1)}',
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
         ),
+      ),
     );
   }
 }
