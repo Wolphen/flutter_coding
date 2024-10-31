@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_coding/profile.dart';
 import './camembert.dart';
-
+import './dashboard_page.dart'; // Nouvelle page du tableau de bord
+import './bdd/session_manager.dart';
 
 class Header extends StatefulWidget implements PreferredSizeWidget {
   final String nom;
@@ -42,8 +43,13 @@ class _HeaderState extends State<Header> {
           ),
         if (widget.isAdmin)
           IconButton(
-            icon: Icon(Icons.admin_panel_settings),
-            onPressed: () {},
+            icon: Icon(Icons.dashboard), // Nouveau bouton pour le tableau de bord
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DashboardPage()),
+              );
+            },
           ),
         IconButton(
           icon: const Icon(Icons.person),
