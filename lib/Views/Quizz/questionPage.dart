@@ -23,14 +23,12 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
-
-  //---------------------------Liste des questions---------------------------//
   int currentQuestionIndex = 0;
   int score = 0;
   List<Question> questions = [];
   bool isLoading = true;
-  bool isValidate = false;
   bool revealAnswer = false;
+  bool showContinueButton = false; // Nouveau booléen pour changer le texte du bouton
   List<Reponse> reponsesSelected = [];
   List<Reponse> reponsesCorrect = [];
 
@@ -45,30 +43,10 @@ class _QuestionPageState extends State<QuestionPage> {
       });
     });
   }
-  void _onAnswerValidate(Question question) {
-
-    for (Reponse reponse in question.reponses!) {
-      if (reponse.isSelected) {
-        reponsesSelected.add(reponse);
-      }
-      if (reponse.is_correct) {
-        reponsesCorrect.add(reponse);
-      }
-    }
-    revealAnswer = true;
-    bool isCorrect = reponsesSelected.length == reponsesCorrect.length && reponsesSelected.every((reponse) => reponsesCorrect.contains(reponse));
-
-    if (isCorrect) {
-      score++;
-    }
-    setState(() {
-      currentQuestionIndex++;
-    });
-  }
 
   void _startTimer() {
     revealAnswer = false;
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       if (currentQuestionIndex < questions.length) {
         setState(() {
           if (questions[currentQuestionIndex].timer > 0) {
@@ -82,6 +60,44 @@ class _QuestionPageState extends State<QuestionPage> {
       } else {
         timer.cancel();
       }
+    });
+  }
+
+  void _onAnswerValidate(Question question) {
+    reponsesSelected.clear();
+    reponsesCorrect.clear();
+
+    for (Reponse reponse in question.reponses!) {
+      if (reponse.isSelected) {
+        reponsesSelected.add(reponse);
+      }
+      if (reponse.is_correct) {
+        reponsesCorrect.add(reponse);
+      }
+    }
+
+    // Vérifie si toutes les réponses sélectionnées sont correctes
+    bool isCorrect = reponsesSelected.length == reponsesCorrect.length &&
+        reponsesSelected.every((reponse) => reponsesCorrect.contains(reponse));
+
+    if (isCorrect) {
+      score++;
+    }
+
+    setState(() {
+      revealAnswer = true; // Afficher les réponses correctes et incorrectes
+      showContinueButton = true; // Afficher le bouton Continuer
+    });
+  }
+
+  void _continueToNextQuestion() {
+    setState(() {
+      revealAnswer = false;
+      showContinueButton = false;
+      reponsesSelected.clear();
+      reponsesCorrect.clear();
+      currentQuestionIndex++;
+      _startTimer();
     });
   }
 
@@ -112,7 +128,7 @@ class _QuestionPageState extends State<QuestionPage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HomePage(userInfo: widget.userInfo), // Assurez-vous de fournir userInfo ici
+                                builder: (context) => HomePage(userInfo: widget.userInfo),
                               ),
                             );
                           },
@@ -151,13 +167,22 @@ class _QuestionPageState extends State<QuestionPage> {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.4,
             child: CheckboxListTile(
-              title: Text(reponse.texte),
+              title: Text(
+                reponse.texte,
+                style: TextStyle(
+                  color: revealAnswer
+                      ? (reponse.is_correct ? Colors.green : Colors.red)
+                      : Colors.black,
+                ),
+              ),
               value: reponse.isSelected,
-              onChanged: (bool? value) {
-                setState(() {
-                  reponse.isSelected = value!;
-                });
-              },
+              onChanged: revealAnswer
+                  ? null // Désactiver les boutons après validation
+                  : (bool? value) {
+                      setState(() {
+                        reponse.isSelected = value!;
+                      });
+                    },
             ),
           );
         }).toList(),
@@ -185,7 +210,7 @@ class _QuestionPageState extends State<QuestionPage> {
                       child: const Text('Confirmer'),
                       onPressed: () {
                         Navigator.of(context).pop();
-                        onPressed(context, widget.userInfo); // Utilisez widget.userInfo ici
+                        onPressed(context, widget.userInfo);
                       },
                     ),
                   ],
@@ -198,10 +223,10 @@ class _QuestionPageState extends State<QuestionPage> {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
             ),
-            onPressed: () {
-              _onAnswerValidate(questions[currentQuestionIndex]);
-            },
-            child: const Text("Valider"),
+            onPressed: showContinueButton
+                ? _continueToNextQuestion // Passer à la prochaine question
+                : () => _onAnswerValidate(questions[currentQuestionIndex]),
+            child: Text(showContinueButton ? "Continuer" : "Valider"),
           ),
         ],
       ),
