@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import './bdd/connectToDTB.dart';
 import './auth/signUp.dart';
+import './Controllers/homePage.dart';
+import 'Models/categorie.dart';
 
 class UserProfilePage extends StatefulWidget {
   final String id;
@@ -15,22 +17,29 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Map<String, dynamic>? user;
   late MongoDBService mongoDBService;
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController nomController = TextEditingController();
   final TextEditingController prenomController = TextEditingController();
   final TextEditingController mailController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController adressePostaleController = TextEditingController();
   int? selectedMotivation;
+  List<Categorie> categories = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     mongoDBService = MongoDBService();
     loadUserData();
-    if (user != null) {
-      selectedMotivation = user!['motivation'];
-    }
+    loadCategories();
+  }
+
+  Future<void> loadCategories() async {
+    final fetchedCategories = await onInit();
+    setState(() {
+      categories = fetchedCategories;
+      isLoading = false;
+    });
   }
 
   Future<void> loadUserData() async {
@@ -58,9 +67,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
     };
 
     // Utiliser `widget.id` pour l'ID utilisateur
-    await mongoDBService.updateUser(updatedUser, widget.id);
-    Navigator.of(context).pop();
-    loadUserData();
+    try {
+      await mongoDBService.updateUser(updatedUser, widget.id);
+      Navigator.of(context).pop();
+      loadUserData();
+    } catch (e) {
+      showErrorDialog("Erreur lors de la mise à jour des données.");
+    }
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) =>
+          AlertDialog(
+            title: Text("Erreur"),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("OK"),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
@@ -74,75 +104,101 @@ class _UserProfilePageState extends State<UserProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (context, setDialogState) => AlertDialog(
-            insetPadding: EdgeInsets.symmetric(horizontal: 20),
-            title: Text("Modifier le profil"),
-            content: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        controller: nomController,
-                        decoration: InputDecoration(labelText: 'Nom'),
-                        validator: (value) => value!.isEmpty ? 'Entrez un nom' : null,
-                      ),
-                      TextFormField(
-                        controller: prenomController,
-                        decoration: InputDecoration(labelText: 'Prénom'),
-                        validator: (value) => value!.isEmpty ? 'Entrez un prénom' : null,
-                      ),
-                      TextFormField(
-                        controller: mailController,
-                        decoration: InputDecoration(labelText: 'Email'),
-                        validator: (value) => value!.isEmpty ? 'Entrez un email' : null,
-                      ),
-                      TextFormField(
-                        controller: adressePostaleController,
-                        decoration: InputDecoration(labelText: 'Adresse Postale'),
-                        keyboardType: TextInputType.number,
-                        validator: (value) => value!.isEmpty ? 'Entrez votre adresse postale' : null,
-                      ),
-                      TextFormField(
-                        controller: ageController,
-                        decoration: InputDecoration(labelText: 'Âge'),
-                        keyboardType: TextInputType.number,
-                        validator: (value) => value!.isEmpty ? 'Entrez votre âge' : null,
-                      ),
-                      Column(
-                        children: List.generate(list.length, (index) {
-                          return RadioListTile<int>(
-                            title: Text(list[index]),
-                            value: index,
-                            groupValue: selectedMotivation,
-                            onChanged: (int? value) {
-                              setDialogState(() {
-                                selectedMotivation = value;
-                              });
+          builder: (context, setDialogState) =>
+              AlertDialog(
+                insetPadding: EdgeInsets.symmetric(horizontal: 20),
+                title: Text("Modifier le profil"),
+                content: SizedBox(
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.9,
+                  child: Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextFormField(
+                            controller: nomController,
+                            decoration: InputDecoration(labelText: 'Nom'),
+                            validator: (value) =>
+                            value!.isEmpty
+                                ? 'Entrez un nom'
+                                : null,
+                          ),
+                          TextFormField(
+                            controller: prenomController,
+                            decoration: InputDecoration(labelText: 'Prénom'),
+                            validator: (value) =>
+                            value!.isEmpty
+                                ? 'Entrez un prénom'
+                                : null,
+                          ),
+                          TextFormField(
+                            controller: mailController,
+                            decoration: InputDecoration(labelText: 'Email'),
+                            validator: (value) {
+                              if (value!.isEmpty) return 'Entrez un email';
+                              final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                              return regex.hasMatch(value)
+                                  ? null
+                                  : 'Entrez un email valide';
                             },
-                          );
-                        }),
+                          ),
+                          TextFormField(
+                            controller: adressePostaleController,
+                            decoration: InputDecoration(
+                                labelText: 'Adresse Postale'),
+                            keyboardType: TextInputType.number,
+                            validator: (value) =>
+                            value!.isEmpty
+                                ? 'Entrez votre adresse postale'
+                                : null,
+                          ),
+                          TextFormField(
+                            controller: ageController,
+                            decoration: InputDecoration(labelText: 'Âge'),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value!.isEmpty) return 'Entrez votre âge';
+                              final age = int.tryParse(value);
+                              return (age != null && age > 0)
+                                  ? null
+                                  : 'Entrez un âge valide';
+                            },
+                          ),
+                          Column(
+                            children: List.generate(list.length, (index) {
+                              return RadioListTile<int>(
+                                title: Text(list[index]),
+                                value: index,
+                                groupValue: selectedMotivation,
+                                onChanged: (int? value) {
+                                  setDialogState(() {
+                                    selectedMotivation = value;
+                                  });
+                                },
+                              );
+                            }),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: ElevatedButton(
+                              child: const Text('Enregistrer'),
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  updateUser();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                          child: const Text('Enregistrer'),
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              updateUser();
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
         );
       },
     );
@@ -239,56 +295,42 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
             ),
             Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Card(
-                      elevation: 5,
-                      child: Center(
-                        child: Text(
-                          "Java :",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Card(
-                      elevation: 5,
-                      child: Center(
-                        child: Text(
-                          "HTML/CSS :",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Card(
-                      elevation: 5,
-                      child: Center(
-                        child: Text(
-                          "Algo :",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              child: isLoading
+                  ? const CircularProgressIndicator()
+                  : Wrap(
+                spacing: 10.0,
+                runSpacing: 10.0,
+                alignment: WrapAlignment.center,
+                children: categories.map((categorie) {
+                  return _buildCard(categorie);
+                }).toList(),
               ),
-            )
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  final List<Color> buttonColors = [
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+  ];
+
+  Widget _buildCard(Categorie categorie) {
+    return SizedBox(
+      width: 400,
+      height: 300,
+      child: Card(
+        color: buttonColors[categories.indexOf(categorie) %
+            buttonColors.length],
+        child: Text(
+            categorie.nom,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
     );
   }
 }

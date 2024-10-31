@@ -110,6 +110,10 @@ class MongoDBService {
     }
 
     return successRates;
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final collection = db.collection('Categorie');
+    final categories = await collection.find().toList();
+    return categories.map((category) => category as Map<String, dynamic>).toList();
   }
 
   Future<void> updateUser(Map<String, dynamic> document, String id) async {
@@ -231,6 +235,7 @@ class MongoDBService {
       return false;
     }
   }
+
 
   Future<void> close() async {
     await db.close();
