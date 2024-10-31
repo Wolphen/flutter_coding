@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../Models/quizz.dart';
-import '../../Controllers/Quizz/newQuizz.dart';
 import '../../../Models/question.dart';
 import '../../../Models/reponse.dart';
 import '../../../Controllers/Quizz/editQuizz.dart' as editQuizz;
@@ -21,7 +20,7 @@ class _EditQuizzState extends State<EditQuizz> {
   late Question newQuestion;
   late List<Reponse> reponses;
   final TextEditingController quizzNameController = TextEditingController();
-  final TextEditingController reponseController = TextEditingController();
+  List<TextEditingController> reponseControllers = [];
 
   @override
   void initState() {
@@ -33,10 +32,22 @@ class _EditQuizzState extends State<EditQuizz> {
         reponses = editQuizz.initReponses();
         isLoading = false;
         quizzNameController.text = quizz.nom;
+
+        // Initialiser les contrôleurs pour chaque réponse
+        reponseControllers = List.generate(reponses.length, (_) => TextEditingController());
       });
     });
   }
 
+  @override
+  void dispose() {
+    // Nettoyer les contrôleurs pour éviter les fuites de mémoire
+    quizzNameController.dispose();
+    for (var controller in reponseControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +79,46 @@ class _EditQuizzState extends State<EditQuizz> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: () => onSubmit(context,quizz, widget.userInfo), // Soumettre le quiz
-          child: const Text('Modifier', style: TextStyle(fontSize: 18)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () => editQuizz.onSubmit(context, quizz, widget.userInfo), // Soumettre le quiz
+              child: const Text('Modifier', style: TextStyle(fontSize: 18)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Confirmation"),
+                      content: const Text("Voulez-vous vraiment supprimer ce quizz?"),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text("Annuler"),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text("Supprimer"),
+                          onPressed: () {
+                            editQuizz.deleteQuizz(context, quizz, widget.userInfo);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Supprimer', style: TextStyle(fontSize: 18)),
+            ),
+          ],
         ),
       ),
     );
@@ -117,7 +165,9 @@ class _EditQuizzState extends State<EditQuizz> {
               onChanged: (value) => question.timer = int.tryParse(value) ?? 0,
             ),
             const SizedBox(height: 10),
-            ...List.generate(4, (index) => _buildAnswerField('Réponse ${index + 1}', reponses[index])),
+            ...List.generate(reponses.length, (index) {
+              return _buildAnswerField('Réponse ${index + 1}', reponses[index], reponseControllers[index]);
+            }),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -125,8 +175,9 @@ class _EditQuizzState extends State<EditQuizz> {
                 setState(() {
                   quizz.questions!.add(question); // Ajouter la question au quiz
                   isEdit = false; // Sortir du mode édition
-                  newQuestion = initQuestion(); // Réinitialiser la question
-                  reponses = initReponses(); // Réinitialiser les réponses
+                  newQuestion = editQuizz.initQuestion(); // Réinitialiser la question
+                  reponses = editQuizz.initReponses(); // Réinitialiser les réponses
+                  reponseControllers = List.generate(reponses.length, (_) => TextEditingController());
                 });
               },
               child: const Text('Ajouter la question'),
@@ -137,7 +188,6 @@ class _EditQuizzState extends State<EditQuizz> {
     );
   }
 
-  // Construire un champ de texte
   Widget _buildTextField({
     required String labelText,
     required TextEditingController controller,
@@ -152,19 +202,20 @@ class _EditQuizzState extends State<EditQuizz> {
     );
   }
 
-  // Construire un champ de réponse
-  Widget _buildAnswerField(String label, Reponse reponse) {
+  // Construire un champ de réponse avec un contrôleur dédié
+  Widget _buildAnswerField(String label, Reponse reponse, TextEditingController controller) {
+    controller.text = reponse.texte; // Initialiser le contrôleur avec le texte de la réponse
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Row(
         children: [
           Expanded(
             child: TextField(
-              controller: reponseController,
+              controller: controller,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
               onChanged: (value) {
                 setState(() {
-                  reponse.texte = reponseController.text; // Mettre à jour le texte de la réponse
+                  reponse.texte = value; // Mettre à jour le texte de la réponse
                 });
               },
             ),
@@ -212,4 +263,5 @@ class _EditQuizzState extends State<EditQuizz> {
     );
   }
 }
+
 

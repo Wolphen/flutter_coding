@@ -16,13 +16,13 @@ bool editQuestion(BuildContext context) {
 }
 
 Future<void> onSubmit(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) async {
-  await MongoDBService().insertQuizz(quizz);
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(
       builder: (context) => ListeQuizzPage(userInfo: userInfo, categorieId: quizz.id_categ), // Assurez-vous de fournir userInfo ici
     ),
   );
+  await MongoDBService().editQuizz(quizz);
 }
 
 Future<Quizz> detailQuizz(String quizzId) async {
@@ -43,5 +43,15 @@ Question initQuestion() {
 // Initialisation des réponses
 List<Reponse> initReponses() {
     return List.generate(4, (index) => Reponse(id_qu: '', texte: "", is_correct: false));
+}
+
+Future<void> deleteQuizz(BuildContext context, Quizz quizz, Map<String, dynamic> userInfo) async {
+  await MongoDBService().deleteQuizz(quizz.id!);
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ListeQuizzPage(userInfo: userInfo, categorieId: quizz.id_categ), // Assurez-vous de fournir userInfo ici
+    ),
+  );
 }
 
